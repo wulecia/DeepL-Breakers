@@ -1,0 +1,10 @@
+gensim
+nltk
+scikit-learn
+numpy
+tqdm
+matplotlib
+keras
+wordcloud
+pydot
+graphviz
