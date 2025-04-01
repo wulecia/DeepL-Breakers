@@ -103,7 +103,7 @@ class Classifier:
 
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        joblib.dump(self.classifier, path)
+        joblib.dump(self.model, path)  # ✅ Corrigé : sauvegarde l'instance entraînée
 
     def load(self, path):
         self.model = joblib.load(path)  # ✅ Important!
