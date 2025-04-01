@@ -10,6 +10,8 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV
 import matplotlib.pyplot as plt
 import numpy as np
+import joblib
+import os
 
 # Filter out specific warnings only, instead of all warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -98,3 +100,11 @@ class Classifier:
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
         plt.show()
+
+    def save(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        joblib.dump(self.classifier, path)
+
+    def load(self, path):
+        self.model = joblib.load(path)  # ✅ Important!
+        self.classifier = type(self.model)  # still useful if you want to know the type

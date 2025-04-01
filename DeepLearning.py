@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 import matplotlib.pyplot as plt
+import os
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 
@@ -171,3 +172,23 @@ class DeepLearner:
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
         plt.show()
+
+
+    def save(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        torch.save(self.model.state_dict(), path)
+
+    def load(self, path):
+        self.model.load_state_dict(torch.load(path))
+        self.model.eval()
+
+    def predict(self, data):
+        """Predict class labels for input data."""
+        if not isinstance(data, torch.Tensor):
+            data = self.encode_corpus(data)
+
+        with torch.no_grad():
+            outputs = self.model(data)
+            predicted = torch.argmax(outputs, dim=1).numpy()
+
+        return predicted
