@@ -79,6 +79,10 @@ def train_model(task, model_wrapper, dataset, labels, tokenizer, resume=True):
 
     trainer.train(resume_from_checkpoint=checkpoint_path if checkpoint_path else None)
     trainer.save_model(f"./best_model_{task}_{model_wrapper.model_name.split('/')[-1]}")
+    torch.save(
+        model_wrapper.model.state_dict(),
+        f"./best_model_{task}_{model_wrapper.model_name.split('/')[-1]}.pth"
+    )
     print(f"✅ Task {task} training complete.")
 
 
