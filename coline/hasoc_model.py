@@ -165,7 +165,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         output_dir=output_dir,
         logging_dir=logging_dir,
         num_train_epochs=4,
-        per_device_train_batch_size=8,
+        per_device_train_batch_size=4,
         per_device_eval_batch_size=16,
         save_strategy="steps" if task == "B" else "epoch",
         save_steps=500 if task == "B" else None,
