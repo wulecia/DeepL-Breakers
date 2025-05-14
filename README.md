@@ -1,3 +1,9 @@
+(https://drive.google.com/uc?export=download&id=//drive.google.com/drive/folders/1hS2h_-8KdlioXV5tssHBqQEeciJ3OP4i?usp=sharing)
+
+
+
+
+
 # Offenseval
 SemEval 2019 - Task 6 - Identifying and Categorizing Offensive Language in Social Media 
 
