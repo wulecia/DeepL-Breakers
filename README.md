@@ -4,7 +4,7 @@
 This project explores hate speech and offensive language detection using transformer-based models. It proceeds in two main stages:
 
 ### Feature Extraction Model:
-1. Train 13-label model on base dataset: We first train a BERTMultiTaskModel model on a labeled dataset from [Berkeley](#ref1) containing 13 distinct categories (8 numerical: sentiment, respect, insult, humiliate, status, dehumanize, attack_defend, hatespeech; 5 binary: target_race, target_religion, target_origin, target_gender, target_sexuality).
+1. Train 13-label model on base dataset: We first train a BERTMultiTaskModel model on a labeled [dataset from Berkeley](#ref1) containing 13 distinct categories (8 numerical: *sentiment*, *respect*, *insult*, *humiliate*, *status*, *dehumanize*, *attack_defend*, *hatespeech*; 5 binary: *target_race*, *target_religion*, *target_origin*, *target_gender*, *target_sexuality*).
 2. Infer 13 features for each HASOC tweet: After achieving satisfying performance, we apply this model to a second dataset — [HASOC 2019](#ref2) — to annotate tweets with these 13 inferred features.
 
 ### Hate Speech Classification Models:
@@ -46,10 +46,10 @@ Tokenization
 BERTMultiTaskModel, RoBERTa, HateBERT
 
 ## Running
-- Move this to the folder "paola":  
+- Move these to the folder "paola":  
 gdown https://drive.google.com/uc?id=10hcRYw1qxgabsqiXMVbO-qF4LmaRJM4l   
 gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW  
-- Move this to the folder "coline":  
+- Move these to the folder "coline":  
 gdown https://drive.google.com/uc?id=1PCzrY1vg6NcG_T9ogi46swyufyEOtOg9  
 gdown https://drive.google.com/uc?id=1qj0GclRw8y3Y6jSOnyBS8rVd23K-Ebqr  
 gdown https://drive.google.com/uc?id=1eCx2Lmbhh_eVAbyy-lpO8QSl3jSI6Fci  
