@@ -17,7 +17,6 @@ get_ipython().run_line_magic('autoreload', '2')
 
 #torch.cuda.empty_cache()
 #torch.cuda.ipc_collect()
-import torch
 print(torch.cuda.is_available())  # False signifie aucun GPU dispo
 print(torch.version.cuda)         # Version du runtime CUDA attendu (si dispo)
 device = torch.device("cpu")
