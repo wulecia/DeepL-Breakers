@@ -13,17 +13,15 @@ This project explores hate speech and offensive language detection using transfo
 
 ## Subtasks
 The HASOC 2019 dataset contains tweets in English, German, and Hindi. We focus on English tweets across three subtasks:
-- Sub-task A: Offensive Language Identification (HOF vs. NOT)
-
-Classify tweets as either:
+- Sub-task A: Offensive Language Identification (HOF vs. NOT)  
+  Classify tweets as either:
 
 HOF – Hate and Offensive: Contains hate speech, aggression, or profanity.
 
 NOT – Non Hate-Offensive: Contains acceptable content without any offensive language.
 
 - Sub-task B: Fine-Grained Offensive Type Classification
-
-Only tweets labeled as HOF in sub-task A are used. Each HOF tweet is further categorized into:
+  Only tweets labeled as HOF in sub-task A are used. Each HOF tweet is further categorized into:
 
 HATE – Hate speech targeting groups based on race, gender, religion, etc.
 
