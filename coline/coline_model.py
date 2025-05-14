@@ -5,6 +5,8 @@
 
 
 import torch
+torch.cuda.empty_cache()
+torch.cuda.ipc_collect()
 from transformers import AutoModel, AutoTokenizer
 import torch.nn as nn
 import pandas as pd
@@ -251,7 +253,8 @@ datasetA = Dataset.from_dict({
 datasetA = datasetA.train_test_split(test_size=0.2, seed=42)
 
 train_model(task, model_colineA, datasetA, tokenizer_claraA, resume=True)
-
+torch.cuda.empty_cache()
+torch.cuda.ipc_collect()
 
 # In[55]:
 
@@ -329,7 +332,8 @@ datasetB = Dataset.from_dict({
 datasetB = datasetB.train_test_split(test_size=0.2, seed=42)
 
 train_model(task, model_colineB, datasetB, tokenizer_claraB, resume=True)
-
+torch.cuda.empty_cache()
+torch.cuda.ipc_collect()
 
 # In[24]:
 
@@ -407,7 +411,8 @@ datasetC = Dataset.from_dict({
 datasetC = datasetC.train_test_split(test_size=0.2, seed=42)
 
 train_model(task, model_colineC, datasetC, tokenizer_claraC, resume=True)
-
+torch.cuda.empty_cache()
+torch.cuda.ipc_collect()
 
 # In[ ]:
 
