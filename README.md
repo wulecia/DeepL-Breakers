@@ -20,7 +20,7 @@ HOF – Hate and Offensive: Contains hate speech, aggression, or profanity.
 
 NOT – Non Hate-Offensive: Contains acceptable content without any offensive language.
 
-- Sub-task B: Fine-Grained Offensive Type Classification
+- Sub-task B: Fine-Grained Offensive Type Classification  
   Only tweets labeled as HOF in sub-task A are used. Each HOF tweet is further categorized into:
 
 HATE – Hate speech targeting groups based on race, gender, religion, etc.
@@ -31,9 +31,8 @@ PRFN – Profane language without specific targeting (e.g., general swearing or 
 
 This task disambiguates the type of offense expressed in HOF tweets.
 
-- Sub-task C: Offense Target Identification
-
-Only tweets labeled HOF in sub-task A are included. The goal is to determine the target of the offensive language:
+- Sub-task C: Offense Target Identification  
+  Only tweets labeled HOF in sub-task A are included. The goal is to determine the target of the offensive language:
 
 TIN – Targeted Insult: Direct insult/threat against individuals, groups, or other entities.
 
@@ -49,12 +48,10 @@ Tokenization
 BERTMultiTaskModel, RoBERTa, HateBERT
 
 ## Running
-- Move this to the folder "paola":
-
+- Move this to the folder "paola":  
 gdown https://drive.google.com/uc?id=10hcRYw1qxgabsqiXMVbO-qF4LmaRJM4l   
 gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW  
-- Move this to the folder "coline":
-
+- Move this to the folder "coline":  
 gdown https://drive.google.com/uc?id=1PCzrY1vg6NcG_T9ogi46swyufyEOtOg9  
 gdown https://drive.google.com/uc?id=1qj0GclRw8y3Y6jSOnyBS8rVd23K-Ebqr  
 gdown https://drive.google.com/uc?id=1eCx2Lmbhh_eVAbyy-lpO8QSl3jSI6Fci  
