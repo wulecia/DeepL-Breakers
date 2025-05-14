@@ -17,13 +17,16 @@ The HASOC 2019 dataset contains tweets in English, German, and Hindi. We focus o
 Classify tweets as either:
 
 HOF – Hate and Offensive: Contains hate speech, aggression, or profanity.
+
 NOT – Non Hate-Offensive: Contains acceptable content without any offensive language.
 
 - Sub-task B: Fine-Grained Offensive Type Classification
 Only tweets labeled as HOF in sub-task A are used. Each HOF tweet is further categorized into:
 
 HATE – Hate speech targeting groups based on race, gender, religion, etc.
+
 OFFN – Offensive language targeting an individual or group, including insults or threats.
+
 PRFN – Profane language without specific targeting (e.g., general swearing or cursing).
 
 This task disambiguates the type of offense expressed in HOF tweets.
@@ -32,6 +35,7 @@ This task disambiguates the type of offense expressed in HOF tweets.
 Only tweets labeled HOF in sub-task A are included. The goal is to determine the target of the offensive language:
 
 TIN – Targeted Insult: Direct insult/threat against individuals, groups, or other entities.
+
 UNT – Untargeted: Profane or aggressive language without a specific target.
 
 
