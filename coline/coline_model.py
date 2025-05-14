@@ -15,8 +15,12 @@ from hasoc_model import *
 get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
-torch.cuda.empty_cache()
-torch.cuda.ipc_collect()
+#torch.cuda.empty_cache()
+#torch.cuda.ipc_collect()
+import torch
+print(torch.cuda.is_available())  # False signifie aucun GPU dispo
+print(torch.version.cuda)         # Version du runtime CUDA attendu (si dispo)
+device = torch.device("cpu")
 
 
 # In[41]:
@@ -35,11 +39,11 @@ df_claraA = df_clara.dropna(subset=["label_A_enc"])
 labelsA = df_claraA["label_A_enc"].tolist()
 df_claraA = df_claraA["text"].tolist()
 
-df_claraB = df[df["label_A"] == "HOF"].dropna(subset=["label_B_enc"])
+df_claraB = df_clara[df_clara["label_A"] == "HOF"].dropna(subset=["label_B_enc"])
 labelsB = df_claraB["label_B_enc"].tolist()
 df_claraB = df_claraB["text"].tolist()
 
-df_claraC = df[(df["label_A"] == "HOF") & (df["label_C"].isin(["UNT", "TIN"]))].dropna(subset=["label_C_enc"])
+df_claraC = df_clara[(df_clara["label_A"] == "HOF") & (df_clara["label_C"].isin(["UNT", "TIN"]))].dropna(subset=["label_C_enc"])
 labelsC = df_claraC["label_C_enc"].tolist()
 df_claraC = df_claraC["text"].tolist()
 
