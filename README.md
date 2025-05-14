@@ -20,7 +20,7 @@ gdown https://drive.google.com/uc?id=1eCx2Lmbhh_eVAbyy-lpO8QSl3jSI6Fci
 This project explores hate speech and offensive language detection using transformer-based models. It proceeds in two main stages:
 
 ### Feature Extraction Model:
-1. Train 13-label model on base dataset: We first train a BERTMultiTaskModel model on a labeled dataset [1] containing 13 distinct categories (8 numerical: sentiment, respect, insult, humiliate, status, dehumanize, attack_defend, hatespeech; 5 binary: target_race, target_religion, target_origin, target_gender, target_sexuality).
+1. Train 13-label model on base dataset: We first train a BERTMultiTaskModel model on a labeled dataset from Berkeley [1] containing 13 distinct categories (8 numerical: sentiment, respect, insult, humiliate, status, dehumanize, attack_defend, hatespeech; 5 binary: target_race, target_religion, target_origin, target_gender, target_sexuality).
 2. Infer 13 features for each HASOC tweet: After achieving satisfying performance, we apply this model to a second dataset — HASOC 2019 [2] — to annotate tweets with these 13 inferred features.
 
 ### Hate Speech Classification Models:
@@ -58,7 +58,7 @@ BERTMultiTaskModel, RoBERTa, HateBERT
 ## Running
 - Install requirements using `pip3 install -r requirements.txt`
 
-- `paola/...py` to train the BertMultiTasks model on ... Dataset.
+- `paola/...py` to train the BertMultiTasks model on Berkeley Dataset.
 - `clara/...py` to train the RoBERTa and HateBERT models on Hasoc Dataset.
 - `coline/coline_model.py` to train the fine-tuned model on Hasoc Dataset.
 - `coline/predict.py` to evaluate the fine-tuned model on Hasoc Dataset.
