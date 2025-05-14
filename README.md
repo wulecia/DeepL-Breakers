@@ -4,8 +4,8 @@
 This project explores hate speech and offensive language detection using transformer-based models. It proceeds in two main stages:
 
 ### Feature Extraction Model:
-1. Train 13-label model on base dataset: We first train a BERTMultiTaskModel model on a labeled dataset from [Berkeley] (#ref1) containing 13 distinct categories (8 numerical: sentiment, respect, insult, humiliate, status, dehumanize, attack_defend, hatespeech; 5 binary: target_race, target_religion, target_origin, target_gender, target_sexuality).
-2. Infer 13 features for each HASOC tweet: After achieving satisfying performance, we apply this model to a second dataset — HASOC 2019 [2] — to annotate tweets with these 13 inferred features.
+1. Train 13-label model on base dataset: We first train a BERTMultiTaskModel model on a labeled dataset from [Berkeley](#ref1) containing 13 distinct categories (8 numerical: sentiment, respect, insult, humiliate, status, dehumanize, attack_defend, hatespeech; 5 binary: target_race, target_religion, target_origin, target_gender, target_sexuality).
+2. Infer 13 features for each HASOC tweet: After achieving satisfying performance, we apply this model to a second dataset — [HASOC 2019](#ref2) — to annotate tweets with these 13 inferred features.
 
 ### Hate Speech Classification Models:
 3. Train RoBERTa & HateBERT models on HASOC Sub-tasks A, B, and C: Using the HASOC 2019 dataset, we train classification models (RoBERTa and HateBERT) to solve the three HASOC subtasks (A, B, and C).
@@ -83,4 +83,5 @@ KNN, Naïve Bayes, SVM, Decision Trees, Random Forest, Logistic Regression, MLP,
 <a name="ref1"></a>
 **[1]** Kennedy, C. J., Bacon, G., Sahn, A., & von Vacano, C. (2020). Constructing interval variables via faceted Rasch measurement and multitask deep learning: A hate speech application. D-Lab, University of California, Berkeley; Department of Biomedical Informatics, Harvard Medical School; Department of Linguistics, UC Berkeley; Travers Department of Political Science, UC Berkeley; Digital Humanities, UC Berkeley. [Version: September 23, 2020]. Corresponding author: ck37@berkeley.edu.
 
-[2]: Mandl, T., Modha, S., Majumder, P., & Patel, D. H. (2019). Overview of the HASOC track at FIRE 2019: Hate Speech and Offensive Content Identification in Indo-European languages. In Proceedings of the 11th annual meeting of the Forum for Information Retrieval Evaluation (FIRE 2019). CEUR-WS.org. Available at: https://ceur-ws.org/Vol-2517/T3-1.pdf
+<a name="ref2"></a>
+**[2]** Mandl, T., Modha, S., Majumder, P., & Patel, D. H. (2019). Overview of the HASOC track at FIRE 2019: Hate Speech and Offensive Content Identification in Indo-European languages. In Proceedings of the 11th annual meeting of the Forum for Information Retrieval Evaluation (FIRE 2019). CEUR-WS.org. Available at: https://ceur-ws.org/Vol-2517/T3-1.pdf
