@@ -20,7 +20,7 @@ from hasoc_model import *
 # In[2]:
 
 
-df_clara = pd.read_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_train.tsv", sep="\t")
+df_clara = pd.read_csv("hasoc_model/hasoc_dataset/hasoc_dataset_with_features_train.tsv", sep="\t")
 df_clara.columns = ["text", "label_A", "label_B", "label_C", 'label_A_enc',  'label_B_enc',  'label_C_enc', 'sentiment', 'respect', 'insult', 'humiliate', 'status',
                   'dehumanize', 'attack_defend', 'hatespeech',
                      'target_race', 'target_religion', 'target_origin', 'target_gender',
