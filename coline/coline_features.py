@@ -15,7 +15,8 @@ from hasoc_model import encode_labels
 
 #torch.cuda.empty_cache()
 #torch.cuda.ipc_collect()
-
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 # In[7]:
 
@@ -60,9 +61,19 @@ class Paola(nn.Module):
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model_paola = Paola().to(device)
-model_paola.load_state_dict(torch.load("paola/model2_loaded.pth", map_location=device, weights_only=True))
+model_paola = Paola()
 
+# Enable multi-GPU if available
+if torch.cuda.device_count() > 1:
+    print(f"Using {torch.cuda.device_count()} GPUs with DataParallel")
+    model_paola = nn.DataParallel(model_paola)
+
+model_paola = model_paola.to(device)
+
+# Load model weights (make sure weights_only=True if available)
+model_paola.load_state_dict(
+    torch.load("paola/model2_loaded.pth", map_location=device, weights_only=True)
+)
 print("model2_loaded.pth loaded and ready to use!")
 
 tokenizer_paola = AutoTokenizer.from_pretrained("distilbert-base-uncased")
