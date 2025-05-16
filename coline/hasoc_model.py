@@ -203,25 +203,15 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
     
     (model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper).freeze_transformer()
 
-    if task in ["B", "A"]:
-        trainer = WeightedFocalLossTrainer(
-            class_weights=model.class_weights,
-            model=model_wrapper,
-            args=training_args,
-            train_dataset=dataset["train"],
-            eval_dataset=dataset["test"],
-            compute_metrics=compute_metrics,
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=2)]
-        )
-    else:
-        trainer = Trainer(
-            model=model_wrapper,
-            args=training_args,
-            train_dataset=dataset["train"],
-            eval_dataset=dataset["test"],
-            tokenizer=tokenizer,
-            compute_metrics=compute_metrics
-        )
+    trainer = WeightedFocalLossTrainer(
+        class_weights=model.class_weights,
+        model=model_wrapper,
+        args=training_args,
+        train_dataset=dataset["train"],
+        eval_dataset=dataset["test"],
+        compute_metrics=compute_metrics,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=2)]
+    )
     
 
     trainer.train(resume_from_checkpoint=checkpoint_path if checkpoint_path else None)
