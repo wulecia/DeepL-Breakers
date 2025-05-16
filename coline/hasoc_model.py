@@ -226,10 +226,12 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
 
     trainer.train(resume_from_checkpoint=checkpoint_path if checkpoint_path else None)
 
-    trainer.save_model(f"./best_colinemodel_{task}_{model_wrapper.model_name.split('/')[-1]}")
+    model_name_str = (model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper).model_name
+
+    trainer.save_model(f"./best_colinemodel_{task}_{model_name_str.split('/')[-1]}")
     torch.save(
         model_wrapper.state_dict(),
-        f"./best_colinemodel_{task}_{model_wrapper.model_name.split('/')[-1]}.pth"
+        f"./best_colinemodel_{task}_{model_name_str.split('/')[-1]}.pth"
     )
     print(f"Task {task} training complete.")
     
