@@ -183,7 +183,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         per_device_eval_batch_size=16,
         save_strategy="steps" if task == "B" else "epoch",
         save_steps=500 if task == "B" else None,
-        eval_strategy="epoch",
+        eval_strategy="steps" if task == "B" else "epoch",
         eval_steps=500 if task == "B" else None,
         logging_steps=100,
         learning_rate=2e-5,
