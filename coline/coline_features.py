@@ -10,11 +10,11 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 from hasoc_model import encode_labels
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
+#get_ipython().run_line_magic('load_ext', 'autoreload')
+#get_ipython().run_line_magic('autoreload', '2')
 
-torch.cuda.empty_cache()
-torch.cuda.ipc_collect()
+#torch.cuda.empty_cache()
+#torch.cuda.ipc_collect()
 
 
 # In[7]:
