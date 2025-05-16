@@ -10,11 +10,11 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 from hasoc_model import *
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
+#get_ipython().run_line_magic('load_ext', 'autoreload')
+#get_ipython().run_line_magic('autoreload', '2')
 
-torch.cuda.empty_cache()
-torch.cuda.ipc_collect()
+#torch.cuda.empty_cache()
+#torch.cuda.ipc_collect()
 
 
 # In[2]:
@@ -157,8 +157,16 @@ attention_mask_claraA = encodings_claraA['attention_mask'].to(device)
 
 class_weightsA = compute_class_weights(labelsA, NUM_LABELS[task], task=task)
 
-model_colineA = Coline(task="A", model_name="roberta-base", class_weights=class_weightsA).to(device)
+model_colineA = Coline(task="A", model_name="roberta-base", class_weights=class_weightsA)
 state_dictA = torch.load("best_model_A_roberta-base.pth", map_location=device, weights_only=True)
+model_colineA.transformer.load_state_dict(
+    {k.replace("roberta.", ""): v for k, v in state_dictA.items() if k.startswith("roberta.")},
+    strict=False
+)
+if torch.cuda.device_count() > 1:
+    print(f"[A] Using {torch.cuda.device_count()} GPUs with DataParallel")
+    model_colineA = nn.DataParallel(model_colineA)
+model_colineA = model_colineA.to(device)
 
 # Strip "roberta." from the beginning of keys that belong to the transformer
 transformer_state_dictA = {
@@ -219,11 +227,21 @@ attention_mask_claraB = encodings_claraB['attention_mask'].to(device)
 
 class_weightsB = compute_class_weights(labelsB, NUM_LABELS[task], task=task)
 
-model_colineB = Coline(task="B", model_name="GroNLP/hateBERT", class_weights=class_weightsB).to(device)
+model_colineB = Coline(task="B", model_name="GroNLP/hateBERT", class_weights=class_weightsB)
 state_dictB = torch.load("best_model_B_hateBERT.pth", map_location=device, weights_only=True)
 
-# Adjust the layer names if needed, e.g., by stripping out certain prefixes
-model_colineB.transformer.load_state_dict({k.replace("bert.", ""): v for k, v in state_dictB.items()}, strict=False)
+# Adjust the layer names if needed
+model_colineB.transformer.load_state_dict(
+    {k.replace("bert.", ""): v for k, v in state_dictB.items()},
+    strict=False
+)
+
+# Wrap with DataParallel if using multiple GPUs
+if torch.cuda.device_count() > 1:
+    print(f"[B] Using {torch.cuda.device_count()} GPUs with DataParallel")
+    model_colineB = nn.DataParallel(model_colineB)
+
+model_colineB = model_colineB.to(device)
 
 
 # In[17]:
@@ -275,11 +293,20 @@ attention_mask_claraC = encodings_claraC['attention_mask'].to(device)
 
 class_weightsC = compute_class_weights(labelsC, NUM_LABELS[task], task=task)
 
-model_colineC = Coline(task="C", model_name="GroNLP/hateBERT", class_weights=class_weightsC).to(device)
+model_colineC = Coline(task="C", model_name="GroNLP/hateBERT", class_weights=class_weightsC)
 state_dictC = torch.load("best_model_C_hateBERT.pth", map_location=device, weights_only=True)
 
-model_colineC.transformer.load_state_dict({k.replace("bert.", ""): v for k, v in state_dictC.items()}, strict=False)
+model_colineC.transformer.load_state_dict(
+    {k.replace("bert.", ""): v for k, v in state_dictC.items()},
+    strict=False
+)
 
+# Wrap with DataParallel if using multiple GPUs
+if torch.cuda.device_count() > 1:
+    print(f"[C] Using {torch.cuda.device_count()} GPUs with DataParallel")
+    model_colineC = nn.DataParallel(model_colineC)
+
+model_colineC = model_colineC.to(device)
 
 # In[29]:
 
