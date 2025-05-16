@@ -20,7 +20,7 @@ from hasoc_model import encode_labels
 # In[7]:
 
 
-df_clara = pd.read_csv("../hasoc_model/hasoc_dataset/train.tsv", sep="\t")
+df_clara = pd.read_csv("hasoc_model/hasoc_dataset/train.tsv", sep="\t")
 df_clara.columns = ["id", "text", "label_A", "label_B", "label_C"]
 df_clara = df_clara[["text", "label_A", "label_B", "label_C"]] 
 df_clara = encode_labels(df_clara)
