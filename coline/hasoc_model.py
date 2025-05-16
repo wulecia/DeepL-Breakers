@@ -186,7 +186,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         do_train=True
     )
     
-    model_wrapper.freeze_transformer()
+    (model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper).freeze_transformer()
 
     if task in ["B", "A"]:
         trainer = WeightedFocalLossTrainer(
