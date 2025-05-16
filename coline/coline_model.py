@@ -175,8 +175,6 @@ transformer_state_dictA = {
     if k.startswith("roberta.")
 }
 
-# Load into the RobertaModel (your transformer's structure)
-model_colineA.transformer.load_state_dict(transformer_state_dictA, strict=False)
 
 
 # In[11]:
