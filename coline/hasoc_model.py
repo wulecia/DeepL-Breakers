@@ -146,8 +146,9 @@ class ModelHASOC(nn.Module):
 
 # === 8. Training ===
 def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
-    output_dir = f"./results_{task}_{model_wrapper.model_name.split('/')[-1]}"
-    logging_dir = f"./logs_{task}_{model_wrapper.model_name.split('/')[-1]}"
+    model = model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper
+    output_dir = f"./results_{task}_{model.model_name.split('/')[-1]}"
+    logging_dir = f"./logs_{task}_{model.model_name.split('/')[-1]}"
 
     checkpoint_path = None
     if resume and os.path.isdir(output_dir):
