@@ -96,9 +96,9 @@ def compute_metrics(eval_pred):
     report = classification_report(labels, preds, output_dict=True, zero_division=0)
 
     return {
-        "eval_f1": report["weighted avg"]["f1-score"],
-        "eval_accuracy": report["accuracy"]
-    }
+    "f1": report["weighted avg"]["f1-score"],
+    "accuracy": report["accuracy"]
+}
 
     
 # === 6. Trainer personnalisé pour tâche B ===
