@@ -111,7 +111,7 @@ combined_preds = np.concatenate([preds_num, preds_bin], axis=1)
 preds_df = pd.DataFrame(combined_preds, columns=new_feature_names)
 df_clara = pd.concat([df_clara.reset_index(drop=True), preds_df], axis=1)
 
-df_clara.to_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_train.tsv", sep='\t', index=False)
+df_clara.to_csv("hasoc_model/hasoc_dataset/hasoc_dataset_with_features_train.tsv", sep='\t', index=False)
 
 
 # In[ ]:
