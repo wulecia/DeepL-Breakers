@@ -58,8 +58,6 @@ class Paola(nn.Module):
 
 
 # In[9]:
-
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model_paola = Paola()
 
@@ -73,11 +71,6 @@ if torch.cuda.device_count() > 1:
     model_paola = nn.DataParallel(model_paola)
 
 model_paola = model_paola.to(device)
-
-# Load model weights (make sure weights_only=True if available)
-model_paola.load_state_dict(
-    torch.load("paola/model2_loaded.pth", map_location=device, weights_only=True)
-)
 print("model2_loaded.pth loaded and ready to use!")
 
 tokenizer_paola = AutoTokenizer.from_pretrained("distilbert-base-uncased")
