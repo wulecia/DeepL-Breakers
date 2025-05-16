@@ -61,7 +61,7 @@ class Paola(nn.Module):
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model_paola = Paola().to(device)
-model_paola.load_state_dict(torch.load("../paola/model2_loaded.pth", map_location=device, weights_only=True))
+model_paola.load_state_dict(torch.load("paola/model2_loaded.pth", map_location=device, weights_only=True))
 
 print("model2_loaded.pth loaded and ready to use!")
 
