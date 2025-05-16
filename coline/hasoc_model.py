@@ -84,22 +84,20 @@ def compute_class_weights(labels, num_labels, task=None):
 
 # === 5. Métriques ===
 def compute_metrics(eval_pred):
-    # Extract from EvalPrediction object
-    
     if isinstance(eval_pred, tuple):
         predictions, loss, labels = eval_pred
     else:
         predictions, labels = eval_pred.predictions, eval_pred.label_ids
 
-    # Check if predictions is a tuple (e.g., logits + something else like loss)
     if isinstance(predictions, tuple):
-        predictions = predictions[0]  # Only take logits
+        predictions = predictions[0]
 
     preds = np.argmax(predictions, axis=1)
     report = classification_report(labels, preds, output_dict=True, zero_division=0)
+
     return {
-        "f1": report["weighted avg"]["f1-score"],
-        "accuracy": report["accuracy"]
+        "eval_f1": report["weighted avg"]["f1-score"],
+        "eval_accuracy": report["accuracy"]
     }
 
     
@@ -169,7 +167,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         per_device_eval_batch_size=16,
         save_strategy="steps" if task == "B" else "epoch",
         save_steps=500 if task == "B" else None,
-        eval_strategy="epoch",
+        eval_strategy="steps" if task == "B" else "epoch",
         eval_steps=500 if task == "B" else None,
         logging_steps=100,
         learning_rate=2e-5,
