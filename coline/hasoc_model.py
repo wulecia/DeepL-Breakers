@@ -183,7 +183,8 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         disable_tqdm=False,
         greater_is_better=True,
         seed=42,
-        do_train=True
+        do_train=True,
+        remove_unused_columns=False
     )
     
     (model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper).freeze_transformer()
