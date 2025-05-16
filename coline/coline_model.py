@@ -158,7 +158,7 @@ attention_mask_claraA = encodings_claraA['attention_mask'].to(device)
 class_weightsA = compute_class_weights(labelsA, NUM_LABELS[task], task=task)
 
 model_colineA = Coline(task="A", model_name="roberta-base", class_weights=class_weightsA)
-state_dictA = torch.load("best_model_A_roberta-base.pth", map_location=device, weights_only=True)
+state_dictA = torch.load("coline/best_model_A_roberta-base.pth", map_location=device, weights_only=True)
 model_colineA.transformer.load_state_dict(
     {k.replace("roberta.", ""): v for k, v in state_dictA.items() if k.startswith("roberta.")},
     strict=False
@@ -228,7 +228,7 @@ attention_mask_claraB = encodings_claraB['attention_mask'].to(device)
 class_weightsB = compute_class_weights(labelsB, NUM_LABELS[task], task=task)
 
 model_colineB = Coline(task="B", model_name="GroNLP/hateBERT", class_weights=class_weightsB)
-state_dictB = torch.load("best_model_B_hateBERT.pth", map_location=device, weights_only=True)
+state_dictB = torch.load("coline/best_model_B_hateBERT.pth", map_location=device, weights_only=True)
 
 # Adjust the layer names if needed
 model_colineB.transformer.load_state_dict(
@@ -294,7 +294,7 @@ attention_mask_claraC = encodings_claraC['attention_mask'].to(device)
 class_weightsC = compute_class_weights(labelsC, NUM_LABELS[task], task=task)
 
 model_colineC = Coline(task="C", model_name="GroNLP/hateBERT", class_weights=class_weightsC)
-state_dictC = torch.load("best_model_C_hateBERT.pth", map_location=device, weights_only=True)
+state_dictC = torch.load("coline/best_model_C_hateBERT.pth", map_location=device, weights_only=True)
 
 model_colineC.transformer.load_state_dict(
     {k.replace("bert.", ""): v for k, v in state_dictC.items()},
