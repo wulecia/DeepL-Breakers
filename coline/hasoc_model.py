@@ -173,7 +173,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         learning_rate=2e-5,
         weight_decay=0.01,
         load_best_model_at_end=True,
-        metric_for_best_model="eval_f1",
+        metric_for_best_model="f1",
         label_smoothing_factor=0.05 if task == "A" else 0.1 if task == "B" else 0.0,
         save_total_limit=2,
         report_to="none",
