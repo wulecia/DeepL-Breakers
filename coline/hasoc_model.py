@@ -120,6 +120,22 @@ class WeightedFocalLossTrainer(Trainer):
         focal_loss = ((1 - pt) ** self.gamma * ce_loss).mean()
 
         return (focal_loss, outputs) if return_outputs else focal_loss
+        
+    def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys=None):
+    """
+    Custom prediction step to handle extra_features in evaluation.
+    """
+    extra_features = inputs.pop("extra_features")
+    labels = inputs.get("labels")
+    
+    with torch.no_grad():
+        outputs = model(extra_features=extra_features, **inputs)
+        loss = None
+        if labels is not None:
+            loss = self.compute_loss(model, {**inputs, "extra_features": extra_features, "labels": labels})
+    
+    logits = outputs["logits"]
+    return (loss, logits, labels)
 
 
 
