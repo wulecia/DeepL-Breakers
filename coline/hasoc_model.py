@@ -190,7 +190,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
 
     if task in ["B", "A"]:
         trainer = WeightedFocalLossTrainer(
-            class_weights=model_wrapper.class_weights,
+            class_weights=model.class_weights,
             model=model_wrapper,
             args=training_args,
             train_dataset=dataset["train"],
