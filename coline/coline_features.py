@@ -63,7 +63,11 @@ class Paola(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model_paola = Paola()
 
-# Enable multi-GPU if available
+# Load weights BEFORE wrapping in DataParallel
+state_dict = torch.load("paola/model2_loaded.pth", map_location=device, weights_only=True)
+model_paola.load_state_dict(state_dict)
+
+# Then wrap in DataParallel if multiple GPUs
 if torch.cuda.device_count() > 1:
     print(f"Using {torch.cuda.device_count()} GPUs with DataParallel")
     model_paola = nn.DataParallel(model_paola)
