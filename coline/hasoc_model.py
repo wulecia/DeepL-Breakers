@@ -144,17 +144,33 @@ class WeightedFocalLossTrainer(Trainer):
         return (loss, logits, labels)
 
 
-def log_metrics_to_csv(metrics_list, task):
+def log_metrics_to_csv(log_history, task):
     import csv
+    from collections import defaultdict
     os.makedirs("visu", exist_ok=True)
     path = f"visu/metrics_{task}.csv"
-    keys = ["epoch", "train_loss", "eval_loss", "eval_f1", "eval_accuracy"]
+    
+    # On accumule les valeurs par epoch
+    epochs = defaultdict(dict)
+    for entry in log_history:
+        if "epoch" in entry:
+            epoch = round(entry["epoch"], 2)
+            for key in ["loss", "eval_loss", "eval_f1", "eval_accuracy"]:
+                if key in entry:
+                    epochs[epoch][key] = entry[key]
 
+    # On écrit le fichier
     with open(path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=keys)
+        writer = csv.DictWriter(f, fieldnames=["epoch", "train_loss", "eval_loss", "eval_f1", "eval_accuracy"])
         writer.writeheader()
-        for entry in metrics_list:
-            row = {k: round(entry.get(k, 0), 5) for k in keys}
+        for epoch in sorted(epochs.keys()):
+            row = {
+                "epoch": epoch,
+                "train_loss": epochs[epoch].get("loss", 0),
+                "eval_loss": epochs[epoch].get("eval_loss", 0),
+                "eval_f1": epochs[epoch].get("eval_f1", 0),
+                "eval_accuracy": epochs[epoch].get("eval_accuracy", 0)
+            }
             writer.writerow(row)
             
 
@@ -247,7 +263,8 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
     # === Sauvegarde des courbes
     metrics_history = trainer.state.log_history
     filtered_metrics = [m for m in metrics_history if "epoch" in m and "loss" in m]
-    log_metrics_to_csv(filtered_metrics, task)
+    # === Sauvegarde des courbes
+    log_metrics_to_csv(trainer.state.log_history, task)
     
 '''
 # === 9. Main Loop ===
