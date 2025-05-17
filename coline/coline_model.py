@@ -16,6 +16,7 @@ from hasoc_model import *
 #torch.cuda.empty_cache()
 #torch.cuda.ipc_collect()
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # In[2]:
 
