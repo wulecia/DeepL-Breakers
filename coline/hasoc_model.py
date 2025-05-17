@@ -13,6 +13,7 @@ from transformers import (
 from datasets import Dataset
 from sklearn.metrics import classification_report
 from sklearn.utils.class_weight import compute_class_weight
+import csv
 
 # === 1. Constantes ===
 MODEL_NAMES = {
@@ -138,6 +139,19 @@ class WeightedFocalLossTrainer(Trainer):
         return (loss, logits, labels)
 
 
+def log_metrics_to_csv(metrics_list, task):
+    import csv
+    os.makedirs("visu", exist_ok=True)
+    path = f"visu/metrics_{task}.csv"
+    keys = ["epoch", "train_loss", "eval_loss", "eval_f1", "eval_accuracy"]
+
+    with open(path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        for entry in metrics_list:
+            row = {k: round(entry.get(k, 0), 5) for k in keys}
+            writer.writerow(row)
+            
 
 # === 7. Classe ModelHASOC ===
 class ModelHASOC(nn.Module):
@@ -184,7 +198,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         save_strategy="steps" if task == "B" else "epoch",
         save_steps=500 if task == "B" else None,
         eval_strategy="steps" if task == "B" else "epoch",
-        eval_steps=500 if task == "B" else None,
+        eval_steps=200 if task == "B" else None,
         logging_steps=100,
         learning_rate=2e-5,
         weight_decay=0.01,
@@ -210,7 +224,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         train_dataset=dataset["train"],
         eval_dataset=dataset["test"],
         compute_metrics=compute_metrics,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=2)]
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)]
     )
     
 
@@ -224,6 +238,11 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         f"./best_colinemodel_{task}_{model_name_str.split('/')[-1]}.pth"
     )
     print(f"Task {task} training complete.")
+
+    # === Sauvegarde des courbes
+    metrics_history = trainer.state.log_history
+    filtered_metrics = [m for m in metrics_history if "epoch" in m and "loss" in m]
+    log_metrics_to_csv(filtered_metrics, task)
     
 '''
 # === 9. Main Loop ===
