@@ -78,8 +78,8 @@ def compute_class_weights(labels, num_labels, task=None):
 
     if task == "A":
         # Renforce significativement le poids de HOF
-        class_weights[1] = 2.5  # HOF
-        class_weights[0] = 1.0  # NOT
+        class_weights[1] = 3.0  # HOF
+        class_weights[0] = 0.9  # NOT
 
     elif task == "C":
         # Renforce le poids de UNT (classe très minoritaire)
