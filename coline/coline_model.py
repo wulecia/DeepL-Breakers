@@ -137,7 +137,7 @@ class Coline(nn.Module):
 
 # In[8]:
 
-
+"""
 task = "A"
 
 
@@ -331,11 +331,87 @@ train_model(task, model_colineC, datasetC, tokenizer_claraC, resume=True)
 # In[ ]:
 
 
-
+"""
 
 
 # In[ ]:
 
+# ======== TASK A ========
+print("\n=== TRAINING TASK A ===")
+task = "A"
+tokenizer_A = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
+enc_A = tokenizer_A(df_claraA, truncation=True, padding=True, return_tensors="pt")
+input_ids_A = enc_A['input_ids'].to(device)
+attention_mask_A = enc_A['attention_mask'].to(device)
+extra_A = np.concatenate([preds_numA, preds_binA], axis=1)
+extra_tensor_A = torch.tensor(extra_A, dtype=torch.float32)
+class_weights_A = compute_class_weights(labelsA, NUM_LABELS[task], task=task)
+print(f"[{task}] class weights:", class_weights_A.cpu().numpy())  # ou class_weights_B etc.
 
+model_A = Coline(task=task, model_name=MODEL_NAMES[task], class_weights=class_weights_A).to(device)
+if torch.cuda.device_count() > 1:
+    print("[A] Using multiple GPUs")
+    model_A = nn.DataParallel(model_A)
+
+dataset_A = Dataset.from_dict({
+    "input_ids": input_ids_A,
+    "attention_mask": attention_mask_A,
+    "labels": torch.tensor(labelsA, dtype=torch.long).tolist(),
+    "extra_features": extra_tensor_A.tolist()
+}).train_test_split(test_size=0.2, seed=42)
+
+train_model(task, model_A, dataset_A, tokenizer_A, resume=True)
+
+# ======== TASK B ========
+print("\n=== TRAINING TASK B ===")
+task = "B"
+tokenizer_B = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
+enc_B = tokenizer_B(df_claraB, truncation=True, padding=True, return_tensors="pt")
+input_ids_B = enc_B['input_ids'].to(device)
+attention_mask_B = enc_B['attention_mask'].to(device)
+extra_B = np.concatenate([preds_numB, preds_binB], axis=1)
+extra_tensor_B = torch.tensor(extra_B, dtype=torch.float32)
+class_weights_B = compute_class_weights(labelsB, NUM_LABELS[task], task=task)
+print(f"[{task}] class weights:", class_weights_B.cpu().numpy())  # ou class_weights_B etc.
+
+model_B = Coline(task=task, model_name=MODEL_NAMES[task], class_weights=class_weights_B).to(device)
+if torch.cuda.device_count() > 1:
+    print("[B] Using multiple GPUs")
+    model_B = nn.DataParallel(model_B)
+
+dataset_B = Dataset.from_dict({
+    "input_ids": input_ids_B,
+    "attention_mask": attention_mask_B,
+    "labels": torch.tensor(labelsB, dtype=torch.long).tolist(),
+    "extra_features": extra_tensor_B.tolist()
+}).train_test_split(test_size=0.2, seed=42)
+
+train_model(task, model_B, dataset_B, tokenizer_B, resume=True)
+
+# ======== TASK C ========
+print("\n=== TRAINING TASK C ===")
+task = "C"
+tokenizer_C = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
+enc_C = tokenizer_C(df_claraC, truncation=True, padding=True, return_tensors="pt")
+input_ids_C = enc_C['input_ids'].to(device)
+attention_mask_C = enc_C['attention_mask'].to(device)
+extra_C = np.concatenate([preds_numC, preds_binC], axis=1)
+extra_tensor_C = torch.tensor(extra_C, dtype=torch.float32)
+class_weights_C = compute_class_weights(labelsC, NUM_LABELS[task], task=task)
+print(f"[{task}] class weights:", class_weights_C.cpu().numpy())  # ou class_weights_B etc.
+
+model_C = Coline(task=task, model_name=MODEL_NAMES[task], class_weights=class_weights_C).to(device)
+if torch.cuda.device_count() > 1:
+    print("[C] Using multiple GPUs")
+    model_C = nn.DataParallel(model_C)
+
+dataset_C = Dataset.from_dict({
+    "input_ids": input_ids_C,
+    "attention_mask": attention_mask_C,
+    "labels": torch.tensor(labelsC, dtype=torch.long).tolist(),
+    "extra_features": extra_tensor_C.tolist()
+}).train_test_split(test_size=0.2, seed=42)
+
+train_model(task, model_C, dataset_C, tokenizer_C, resume=True)
 
 
