@@ -73,21 +73,21 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # === Chargement des modèles ===
 model_A = Coline(task="A", model_name="roberta-base", num_labels=2)  # or whatever NUM_LABELS["A"] is
-state_dictA = torch.load("best_colinemodel_A_roberta-base.pth")
+state_dictA = torch.load("../models_trained/best_colinemodel_A_roberta-base.pth")
 state_dictA.pop('loss_fn.weight', None)
 model_A.load_state_dict(state_dictA, strict=False)
 model_A.to(device)
 tokenizer_A = AutoTokenizer.from_pretrained("roberta-base")
 
 model_B = Coline(task="B", model_name="GroNLP/hateBERT", num_labels=3)  # or whatever NUM_LABELS["A"] is
-state_dictB = torch.load("best_colinemodel_B_hateBERT.pth")
+state_dictB = torch.load("../models_trained/best_colinemodel_B_hateBERT.pth")
 state_dictB.pop('loss_fn.weight', None)
 model_B.load_state_dict(state_dictB, strict=False)
 model_B.to(device)
 tokenizer_B = AutoTokenizer.from_pretrained("GroNLP/hateBERT")
 
 model_C = Coline(task="C", model_name="GroNLP/hateBERT", num_labels=2)  # or whatever NUM_LABELS["A"] is
-state_dictC = torch.load("best_colinemodel_C_hateBERT.pth")
+state_dictC = torch.load("../models_trained/best_colinemodel_C_hateBERT.pth")
 state_dictC.pop('loss_fn.weight', None)
 model_C.load_state_dict(state_dictC, strict=False)
 model_C.to(device)
