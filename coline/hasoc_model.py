@@ -201,7 +201,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=True):
         per_device_train_batch_size=16,
         per_device_eval_batch_size=16,
         save_strategy="steps" if task == "B" else "epoch",
-        save_steps=500 if task == "B" else None,
+        save_steps=200 if task == "B" else None,
         eval_strategy="steps" if task == "B" else "epoch",
         eval_steps=200 if task == "B" else None,
         logging_steps=100,
