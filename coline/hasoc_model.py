@@ -74,14 +74,19 @@ def prepare_dataset(df, task):
 # === 4. Pondération des classes ===
 def compute_class_weights(labels, num_labels, task=None):
     class_weights = compute_class_weight(class_weight='balanced', classes=np.arange(num_labels), y=labels)
+    class_weights = torch.tensor(class_weights, dtype=torch.float)
 
-    if task == "C":
-        class_weights[1] *= 1.0
-        class_weights[0] *= 2.0
+    if task == "A":
+        # Renforce significativement le poids de HOF
+        class_weights[1] *= 3.0  # HOF
+        class_weights[0] *= 0.8  # NOT
 
-    return torch.tensor(class_weights, dtype=torch.float)
+    elif task == "C":
+        # Renforce le poids de UNT (classe très minoritaire)
+        class_weights[0] *= 15.0  # UNT
+        class_weights[1] *= 0.5   # TIN
 
-
+    return class_weights
 
 # === 5. Métriques ===
 def compute_metrics(eval_pred):
