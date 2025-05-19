@@ -108,6 +108,10 @@ tweets = df["text"].tolist()
 
 # === Fonction de prédiction ===
 def predict(texts, extra_features, model, tokenizer, device, max_length=512):
+    
+    if len(texts) == 0:
+        return torch.tensor([], dtype=torch.long)
+    
     model.eval()  # Set the model to evaluation mode
     
     # Tokenize the input texts
@@ -216,45 +220,110 @@ gold_C = [ ["UNT", "TIN"].index(label) if label in ["UNT", "TIN"] else -1 for la
 # In[9]:
 
 
-# === Évaluation Task A ===
+
+# === Convert to encodings ===
+df["label_A_enc"] = df["label_A"].map({"NOT": 0, "HOF": 1})
+df["label_B_enc"] = df["label_B"].map({"HATE": 0, "OFFN": 1, "PRFN": 2})
+df["label_C_enc"] = df["label_C"].map({"UNT": 0, "TIN": 1})
+
+df["pred_A_enc"] = df["pred_A"].map({"NOT": 0, "HOF": 1})
+df["pred_B_enc"] = df["pred_B"].map({"HATE": 0, "OFFN": 1, "PRFN": 2})
+df["pred_C_enc"] = df["pred_C"].map({"UNT": 0, "TIN": 1})
+
+
+# === Evaluation Task A ===
 print("\n=== Task A ===")
-if isinstance(y_pred_A, torch.Tensor):
-    y_pred_A = y_pred_A.cpu().numpy()
+y_true_A = df["label_A_enc"].astype(int)
+y_pred_A = df["pred_A_enc"].astype(int)
 
-if isinstance(gold_A, torch.Tensor):
-    gold_A = gold_A.cpu().numpy()
+print("Accuracy:", accuracy_score(y_true_A, y_pred_A))
+print("F1-score:", f1_score(y_true_A, y_pred_A, average="macro"))
+print(classification_report(y_true_A, y_pred_A, target_names=["NOT", "HOF"]))
 
-print("Accuracy:", accuracy_score(gold_A, y_pred_A))
-print("F1-score:", f1_score(gold_A, y_pred_A, average="macro"))
-print(classification_report(gold_A, y_pred_A, target_names=["NOT", "HOF"]))
+# === Task B: ground truth-based inference ===
+df_B_gt = df[df["label_A"] == "HOF"]
+tweets_B_gt = df_B_gt["text"].tolist()
 
-# === Évaluation Task B ===
-gold_B_eval = [g for i, g in enumerate(gold_B) if off_mask[i] and g != -1]
-pred_B_eval = [ ["HATE", "OFFN", "PRFN"].index(b) for i, b in enumerate(pred_B) if off_mask[i] and gold_B[i] != -1 ]
+preds_numB_gt = df_B_gt[['sentiment', 'respect', 'insult', 'humiliate', 'status',
+                         'dehumanize', 'attack_defend', 'hatespeech']]
+preds_binB_gt = df_B_gt[['target_race', 'target_religion', 'target_origin', 'target_gender',
+                         'target_sexuality']]
 
-print("\n=== Task B ===")
-print("Accuracy:", accuracy_score(gold_B_eval, pred_B_eval))
-print("F1-score:", f1_score(gold_B_eval, pred_B_eval, average="macro"))
-print(classification_report(gold_B_eval, pred_B_eval, target_names=["HATE", "OFFN", "PRFN"]))
+extra_features_B_gt = np.concatenate([preds_numB_gt, preds_binB_gt], axis=1)
+extra_features_tensor_B_gt = torch.tensor(extra_features_B_gt, dtype=torch.float32).to(device)
 
-# === Évaluation Task C ===
-gold_C_eval = [g for i, g in enumerate(gold_C) if off_mask[i] and pred_B[i] == "HATE" and g != -1]
-pred_C_eval = [ ["UNT", "TIN"].index(c) for i, c in enumerate(pred_C) if off_mask[i] and pred_B[i] == "HATE" and gold_C[i] != -1 ]
+y_pred_B_gt = predict(tweets_B_gt, extra_features_tensor_B_gt, model_B, tokenizer_B, device)
 
-print("\n=== Task C ===")
-print("Accuracy:", accuracy_score(gold_C_eval, pred_C_eval))
-print("F1-score:", f1_score(gold_C_eval, pred_C_eval, average="macro"))
-print(classification_report(gold_C_eval, pred_C_eval, target_names=["UNT", "TIN"]))
+# === Assign GT-based predictions into new column
+df["pred_B_gt"] = "NULL"
+df.loc[df["label_A"] == "HOF", "pred_B_gt"] = [ ["HATE", "OFFN", "PRFN"][x] for x in y_pred_B_gt.cpu().numpy() ]
+df["pred_B_gt_enc"] = df["pred_B_gt"].map({"HATE": 0, "OFFN": 1, "PRFN": 2})
 
 
-# In[ ]:
+# === Evaluation Task B ===
+def evaluate_task_B(df, mode="gt"):
+    print(f"\n=== Task B — Mode: {'Ground Truth' if mode == 'gt' else 'Cascade Prediction'} ===")
+    
+    if mode == "gt":
+        mask = (df["label_A_enc"] == 1) & df["label_B_enc"].notna() & df["pred_B_gt_enc"].notna()
+        y_pred = df.loc[mask, "pred_B_gt_enc"].astype(int).tolist()
+    else:
+        mask = (df["pred_A_enc"] == 1) & df["label_B_enc"].notna() & df["pred_B_enc"].notna()
+        y_pred = df.loc[mask, "pred_B_enc"].astype(int).tolist()
+
+    y_true = df.loc[mask, "label_B_enc"].astype(int).tolist()
+
+    print("Accuracy:", accuracy_score(y_true, y_pred))
+    print("F1-score:", f1_score(y_true, y_pred, average="macro"))
+    print(classification_report(y_true, y_pred, target_names=["HATE", "OFFN", "PRFN"]))
 
 
 
 
+# === Task C: ground truth-based inference ===
+df_C_gt = df[df["label_A"] == "HOF"]
+tweets_C_gt = df_C_gt["text"].tolist()
 
-# In[ ]:
+preds_numC_gt = df_C_gt[['sentiment', 'respect', 'insult', 'humiliate', 'status',
+                         'dehumanize', 'attack_defend', 'hatespeech']]
+preds_binC_gt = df_C_gt[['target_race', 'target_religion', 'target_origin', 'target_gender',
+                         'target_sexuality']]
+
+extra_features_C_gt = np.concatenate([preds_numC_gt, preds_binC_gt], axis=1)
+extra_features_tensor_C_gt = torch.tensor(extra_features_C_gt, dtype=torch.float32).to(device)
+
+y_pred_C_gt = predict(tweets_C_gt, extra_features_tensor_C_gt, model_C, tokenizer_C, device)
+
+# === Assign GT-based predictions into new column
+df["pred_C_gt"] = "NULL"
+df.loc[df["label_A"] == "HOF", "pred_C_gt"] = [ ["UNT", "TIN"][x] for x in y_pred_C_gt.cpu().numpy() ]
+df["pred_C_gt_enc"] = df["pred_C_gt"].map({"UNT": 0, "TIN": 1})
 
 
+
+# === Evaluation Task C ===
+def evaluate_task_C(df, mode="gt"):
+    print(f"\n=== Task C — Mode: {'Ground Truth' if mode == 'gt' else 'Cascade Prediction'} ===")
+
+    if mode == "gt":
+        mask = (df["label_A_enc"] == 1) & df["label_C_enc"].notna() & df["pred_C_gt_enc"].notna()
+        y_pred = df.loc[mask, "pred_C_gt_enc"].astype(int).tolist()
+    else:
+        mask = (df["pred_A_enc"] == 1) & df["label_C_enc"].notna() & df["pred_C_enc"].notna()
+        y_pred = df.loc[mask, "pred_C_enc"].astype(int).tolist()
+
+    y_true = df.loc[mask, "label_C_enc"].astype(int).tolist()
+
+    print("Accuracy:", accuracy_score(y_true, y_pred))
+    print("F1-score:", f1_score(y_true, y_pred, average="macro"))
+    print(classification_report(y_true, y_pred, target_names=["UNT", "TIN"]))
+
+
+# === Run all evaluations
+evaluate_task_B(df, mode="gt")
+evaluate_task_B(df, mode="cascade")
+
+evaluate_task_C(df, mode="gt")
+evaluate_task_C(df, mode="cascade")
 
 
