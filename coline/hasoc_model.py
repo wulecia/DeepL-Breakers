@@ -42,30 +42,40 @@ df = encode_labels(df)
 
 
 # === 3. Préparer les datasets ===
-def prepare_dataset(df, task):
+def prepare_dataset(task, split="train"):
+    file_path = f"../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_{split}.tsv"
+    df = pd.read_csv(file_path, sep="\t")
+
     if task == "A":
         df_task = df.dropna(subset=["label_A_enc"])
         labels = df_task["label_A_enc"].tolist()
-
     elif task == "B":
         df_task = df[df["label_A"] == "HOF"].dropna(subset=["label_B_enc"])
         labels = df_task["label_B_enc"].tolist()
-
     elif task == "C":
         df_task = df[(df["label_A"] == "HOF") & (df["label_C"].isin(["UNT", "TIN"]))].dropna(subset=["label_C_enc"])
         labels = df_task["label_C_enc"].tolist()
-
-    if df_task.empty:
-        raise ValueError(f"Aucune donnée trouvée pour la tâche {task}. Vérifie les filtres.")
+    else:
+        raise ValueError("Invalid task")
 
     texts = df_task["text"].tolist()
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
-    encodings = tokenizer(texts, truncation=True, padding=True)
+    encodings = tokenizer(texts, truncation=True, padding=True, max_length=128)
+
+    # Extract extra features
+    extra_features_names = [
+        'sentiment', 'respect', 'insult', 'humiliate', 'status',
+        'dehumanize', 'attack_defend', 'hatespeech',
+        'target_race', 'target_religion', 'target_origin', 'target_gender',
+        'target_sexuality'
+    ]
+    extra_feats = df_task[extra_features_names].astype(np.float32).values.tolist()
 
     dataset = Dataset.from_dict({
         "input_ids": encodings["input_ids"],
         "attention_mask": encodings["attention_mask"],
-        "labels": torch.tensor(labels, dtype=torch.long).tolist()
+        "labels": torch.tensor(labels, dtype=torch.long).tolist(),
+        "extra_features": extra_feats
     })
 
     return dataset.train_test_split(test_size=0.2, seed=42), labels
