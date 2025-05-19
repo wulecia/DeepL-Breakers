@@ -75,7 +75,7 @@ def prepare_dataset(df, task):
 def compute_class_weights(labels, num_labels, task=None):
     class_weights = compute_class_weight(class_weight='balanced', classes=np.arange(num_labels), y=labels)
     class_weights = torch.tensor(class_weights, dtype=torch.float)
-
+    """
     if task == "A":
         # Renforce significativement le poids de HOF
         class_weights[1] = 3.0  # HOF
@@ -85,7 +85,7 @@ def compute_class_weights(labels, num_labels, task=None):
         # Renforce le poids de UNT (classe très minoritaire)
         class_weights[0] *= 10.0  # UNT
         class_weights[1] *= 0.6   # TIN
-
+    """
     return class_weights
 
 # === 5. Métriques ===
@@ -176,20 +176,47 @@ def log_metrics_to_csv(log_history, task):
 
 # === 7. Classe ModelHASOC ===
 class ModelHASOC(nn.Module):
-    def __init__(self, task, model_name=None, num_labels=None, class_weights=None):
-        super(ModelHASOC, self).__init__()
+    def _init_(self, task, model_name=None, num_labels=None, class_weights=None):
+        super(ModelHASOC, self)._init_()
         self.task = task
         self.model_name = model_name or MODEL_NAMES[task]
         self.num_labels = num_labels or NUM_LABELS[task]
         self.class_weights = class_weights
 
-        self.model = AutoModelForSequenceClassification.from_pretrained(
+        # Base transformer encoder
+        self.bert = AutoModelForSequenceClassification.from_pretrained(
             self.model_name,
             num_labels=self.num_labels
+        ).bert  # Just the encoder, not the classifier head
+
+        self.hidden_size = self.bert.config.hidden_size
+
+        # Classification head with extra features (13)
+        self.classifier = nn.Sequential(
+            nn.Linear(self.hidden_size + 13, 128),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(128, self.num_labels)
         )
 
-    def forward(self, **inputs):
-        return self.model(**inputs)
+    def forward(self, input_ids=None, attention_mask=None, extra_features=None, labels=None):
+        # Forward through transformer
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        cls_embedding = outputs.last_hidden_state[:, 0, :]  # CLS token representation
+
+        # Concatenate with extra features
+        combined = torch.cat((cls_embedding, extra_features), dim=1)
+
+        # Classify
+        logits = self.classifier(combined)
+
+        # Optional loss computation
+        loss = None
+        if labels is not None:
+            loss_fn = nn.CrossEntropyLoss(weight=self.class_weights) if self.class_weights is not None else nn.CrossEntropyLoss()
+            loss = loss_fn(logits, labels)
+
+        return {"loss": loss, "logits": logits}
 
         
 
