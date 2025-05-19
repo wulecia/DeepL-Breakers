@@ -186,8 +186,8 @@ def log_metrics_to_csv(log_history, task):
 
 # === 7. Classe ModelHASOC ===
 class ModelHASOC(nn.Module):
-    def _init_(self, task, model_name=None, num_labels=None, class_weights=None):
-        super(ModelHASOC, self)._init_()
+    def __init__(self, task, model_name=None, num_labels=None, class_weights=None):
+        super(ModelHASOC, self).__init__()
         self.task = task
         self.model_name = model_name or MODEL_NAMES[task]
         self.num_labels = num_labels or NUM_LABELS[task]
@@ -203,10 +203,10 @@ class ModelHASOC(nn.Module):
 
         # Classification head with extra features (13)
         self.classifier = nn.Sequential(
-            nn.Linear(self.hidden_size + 13, 128),
+            nn.Linear(self.hidden_size + 13, 256),
             nn.ReLU(),
             nn.Dropout(0.2),
-            nn.Linear(128, self.num_labels)
+            nn.Linear(256, self.num_labels)
         )
 
     def forward(self, input_ids=None, attention_mask=None, extra_features=None, labels=None):
