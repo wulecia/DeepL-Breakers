@@ -25,9 +25,22 @@ EXTRA_FEATURES = [
 ]
 
 WEIGHTS = {
-    "A": [(1.6, 1.2), (1.7, 1.2), (1.8, 1.2), (1.7, 1.1), (1.7, 1.3)],
-    "B": [(1.6, 1.3, 1.6), (1.8, 1.4, 1.7), (2.0, 1.5, 1.8)],
-    "C": [(1.0, 1.8), (1.0, 2.0), (1.0, 2.2)]
+    "A": [
+        (1.0, 1.0), (1.5, 1.0), (1.0, 1.5), (1.3, 1.3),
+        (1.6, 1.4), (1.4, 1.6), (1.8, 1.2), (1.2, 1.8),
+        (2.0, 1.0), (1.0, 2.0), (2.5, 1.0), (1.0, 2.5)
+    ],
+    "B": [
+        (1.0, 1.0, 1.0),
+        (1.5, 1.0, 1.0), (1.0, 1.5, 1.0), (1.0, 1.0, 1.5),
+        (1.8, 1.4, 1.8), (2.0, 1.5, 1.8), (2.0, 3.0, 2.0),
+        (1.5, 4.0, 1.5), (2.0, 4.0, 2.0), (2.5, 5.0, 2.5)
+    ],
+    "C": [
+        (1.0, 1.0), (1.5, 1.0), (1.0, 1.5), (2.0, 1.0), (1.0, 2.0),
+        (2.5, 1.0), (1.0, 2.5), (3.0, 1.0), (1.0, 3.0),
+        (4.0, 1.0), (1.0, 4.0)
+    ]
 }
 
 LABELS = {
@@ -40,7 +53,7 @@ def weight_id(task, weights):
     return f"{task}_{'-'.join([str(w).replace('.', '') for w in weights])}"
 
 def load_model(task, model_id, device):
-    model_path = f"results/best_boostedmodel_{model_id}.pth"
+    model_path = f"results/models/best_boostedmodel_{model_id}.pth"
     model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13)
     state_dict = torch.load(model_path, map_location=device)
     model.load_state_dict(state_dict)
@@ -53,9 +66,10 @@ def get_encoded_inputs(df, tokenizer):
 
 def predict_and_eval(task, model, df, tokenizer, label_col, prefix):
     encodings, extra_feats = get_encoded_inputs(df, tokenizer)
-    input_ids = encodings["input_ids"].to(model.device)
-    attention_mask = encodings["attention_mask"].to(model.device)
-    extra_feats = extra_feats.to(model.device)
+    device = next(model.parameters()).device
+    input_ids = encodings["input_ids"].to(device)
+    attention_mask = encodings["attention_mask"].to(device)
+    extra_feats = extra_feats.to(device)
     labels = df[label_col].values.astype(int)
 
     with torch.no_grad():
@@ -80,7 +94,7 @@ def predict_and_eval(task, model, df, tokenizer, label_col, prefix):
     plt.tight_layout()
     plt.savefig(f"results/grid_metrics/confmat_{prefix}.png")
     plt.close()
-    return report["weighted avg"]["f1-score"], report["accuracy"]
+    return report["weighted avg"]["f1-score"], report["macro avg"]["f1-score"], report["accuracy"]
 
 def run_all_predictions():
     df = pd.read_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_test.tsv", sep="\t")
@@ -109,9 +123,16 @@ def run_all_predictions():
                 label_col = "label_A_enc"
 
             df_task = df_task.dropna(subset=[label_col])
-            f1, acc = predict_and_eval(task, model, df_task, tokenizer, label_col, model_id)
+            f1_weighted, f1_macro, acc = predict_and_eval(task, model, df_task, tokenizer, label_col, model_id)
 
-            summary.append({"task": task, "weights": weights, "model_id": model_id, "f1": f1, "accuracy": acc})
+            summary.append({
+                "task": task,
+                "weights": weights,
+                "model_id": model_id,
+                "f1_weighted": f1_weighted,
+                "f1_macro": f1_macro,
+                "accuracy": acc
+            })
 
     pd.DataFrame(summary).to_csv("results/grid_metrics/summary_f1_accuracy.csv", index=False)
 
