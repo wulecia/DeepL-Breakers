@@ -54,7 +54,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model_paola = Paola()
 
 # Load weights BEFORE wrapping in DataParallel
-state_dict = torch.load("../paola/model2_loaded.pth", map_location=device, weights_only=True)
+state_dict = torch.load("../paola/results/best_model_2025-05-21_14-23-53.pth", map_location=device, weights_only=True)
 model_paola.load_state_dict(state_dict)
 
 # Then wrap in DataParallel if multiple GPUs
@@ -63,7 +63,7 @@ if torch.cuda.device_count() > 1:
     model_paola = nn.DataParallel(model_paola)
 
 model_paola = model_paola.to(device)
-print("model2_loaded.pth loaded and ready to use!")
+print("model.pth loaded and ready to use!")
 
 tokenizer_paola = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
