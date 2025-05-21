@@ -80,111 +80,53 @@ new_feature_names = ['sentiment', 'respect', 'insult', 'humiliate', 'status',
 # In[5]:
 
 
-# -----TRAIN-----
 
-
-# In[6]:
-
-
+# --- TRAIN ---
 df_clara_train = pd.read_csv("../hasoc_model/hasoc_dataset/train.tsv", sep="\t")
 df_clara_train.columns = ["id", "text", "label_A", "label_B", "label_C"]
-df_clara_train = df_clara_train[["text", "label_A", "label_B", "label_C"]] 
+df_clara_train = df_clara_train[["text", "label_A", "label_B", "label_C"]]
 df_clara_train = encode_labels(df_clara_train)
-#df_clara_train = df_clara_train[0:200]
-print(df_clara_train.head())
 
+# Drop encoded labels if already present
+cols_to_remove = ["label_A_enc", "label_B_enc", "label_C_enc"]
+df_clara_train = df_clara_train.drop(columns=[col for col in cols_to_remove if col in df_clara_train.columns])
 
-# In[7]:
-
-
-encodings_paola_train = tokenizer_paola(df_clara_train["text"].tolist(), truncation=True, padding=True, max_length=128, return_tensors="pt")
+encodings_train = tokenizer_paola(df_clara_train["text"].tolist(), truncation=True, padding=True, max_length=128, return_tensors="pt")
+input_ids_train = encodings_train["input_ids"].to(device)
+attention_mask_train = encodings_train["attention_mask"].to(device)
 
 model_paola.eval()
-input_ids_paola_train = encodings_paola_train['input_ids'].to(device)
-attention_mask_paola_train = encodings_paola_train['attention_mask'].to(device)
-
 with torch.no_grad():
-    preds_num_train, preds_bin_train = model_paola(input_ids=input_ids_paola_train, attention_mask=attention_mask_paola_train)
+    preds_num_train, preds_bin_train = model_paola(input_ids=input_ids_train, attention_mask=attention_mask_train)
 
 preds_num_train = preds_num_train.cpu().numpy()
-preds_bin_train = preds_bin_train.cpu().numpy()
-preds_bin_train = (preds_bin_train > 0.5).astype(int)
-
-for idx in range (3):
-    print(f"Sentence: {df_clara_train["text"].tolist()[idx]}")
-    print(f"Numerical predictions: {preds_num_train[idx]}")
-    print(f"Binary predictions: {preds_bin_train[idx]}")
-    print()
-
-
-# In[8]:
-
-
+preds_bin_train = (preds_bin_train.cpu().numpy() > 0.5).astype(int)
 combined_preds_train = np.concatenate([preds_num_train, preds_bin_train], axis=1)
 preds_df_train = pd.DataFrame(combined_preds_train, columns=new_feature_names)
 df_clara_train = pd.concat([df_clara_train.reset_index(drop=True), preds_df_train], axis=1)
-print(df_clara_train.head())
-df_clara_train.to_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_train.tsv", sep='\t', index=False)
+df_clara_train.to_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_train.tsv", sep="\t", index=False)
 
-
-# In[9]:
-
-
-# -----TEST-----
-
-
-# In[13]:
-
-
+# --- TEST ---
 df_clara_test = pd.read_csv("../hasoc_model/hasoc_dataset/test.tsv", sep="\t")
 df_clara_test.columns = ["id", "text", "label_A", "label_B", "label_C"]
-df_clara_test = df_clara_test[["text", "label_A", "label_B", "label_C"]] 
+df_clara_test = df_clara_test[["text", "label_A", "label_B", "label_C"]]
 df_clara_test = encode_labels(df_clara_test)
-#df_clara_test = df_clara_test[0:200]
-print(df_clara_test.head())
 
+df_clara_test = df_clara_test.drop(columns=[col for col in cols_to_remove if col in df_clara_test.columns])
 
-# In[14]:
-
-
-encodings_paola_test = tokenizer_paola(df_clara_test["text"].tolist(), truncation=True, padding=True, max_length=128, return_tensors="pt")
-
-model_paola.eval()
-input_ids_paola_test = encodings_paola_test['input_ids'].to(device)
-attention_mask_paola_test = encodings_paola_test['attention_mask'].to(device)
+encodings_test = tokenizer_paola(df_clara_test["text"].tolist(), truncation=True, padding=True, max_length=128, return_tensors="pt")
+input_ids_test = encodings_test["input_ids"].to(device)
+attention_mask_test = encodings_test["attention_mask"].to(device)
 
 with torch.no_grad():
-    preds_num_test, preds_bin_test = model_paola(input_ids=input_ids_paola_test, attention_mask=attention_mask_paola_test)
+    preds_num_test, preds_bin_test = model_paola(input_ids=input_ids_test, attention_mask=attention_mask_test)
 
 preds_num_test = preds_num_test.cpu().numpy()
-preds_bin_test = preds_bin_test.cpu().numpy()
-preds_bin_test = (preds_bin_test > 0.5).astype(int)
-
-for idx in range (3):
-    print(f"Sentence: {df_clara_test["text"].tolist()[idx]}")
-    print(f"Numerical predictions: {preds_num_test[idx]}")
-    print(f"Binary predictions: {preds_bin_test[idx]}")
-    print()
-
-
-# In[15]:
-
-
+preds_bin_test = (preds_bin_test.cpu().numpy() > 0.5).astype(int)
 combined_preds_test = np.concatenate([preds_num_test, preds_bin_test], axis=1)
 preds_df_test = pd.DataFrame(combined_preds_test, columns=new_feature_names)
 df_clara_test = pd.concat([df_clara_test.reset_index(drop=True), preds_df_test], axis=1)
-
-df_clara_test.to_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_test.tsv", sep='\t', index=False)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
+df_clara_test.to_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_test.tsv", sep="\t", index=False)
 
 
 
