@@ -174,7 +174,7 @@ class WeightedFocalLossTrainer(Trainer):
         return (loss, logits, labels)
 
 
-def train_model(task, model_wrapper, dataset, tokenizer, resume=False):
+def train_model(task, model_wrapper, dataset, tokenizer, resume=False, freeze=False):
     model = model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper
     output_dir = f"./results/results_{task}_{model.model_name.split('/')[-1]}"
     logging_dir = f"./logs_{task}_{model.model_name.split('/')[-1]}"
@@ -218,7 +218,8 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=False):
         remove_unused_columns=False
     )
 
-    model.freeze_transformer()
+    if freeze=True:
+        model.freeze_transformer()
 
     trainer = WeightedFocalLossTrainer(
         class_weights=model.class_weights,
