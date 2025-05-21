@@ -9,7 +9,6 @@ from transformers import AutoModel, AutoTokenizer
 import torch.nn as nn
 import pandas as pd
 import numpy as np
-from hasoc_model import encode_labels
 #get_ipython().run_line_magic('load_ext', 'autoreload')
 #get_ipython().run_line_magic('autoreload', '2')
 
@@ -20,7 +19,12 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 
 # In[2]:
-
+def encode_labels(df):
+    df = df.copy()
+    df["label_A_enc"] = df["label_A"].map({"NOT": 0, "HOF": 1})
+    df["label_B_enc"] = df["label_B"].map({"HATE": 0, "OFFN": 1, "PRFN": 2})
+    df["label_C_enc"] = df["label_C"].map({"UNT": 0, "TIN": 1}) 
+    return df.dropna(subset=["label_A_enc"])
 
 class Paola(nn.Module):
     def __init__(self, model_name="distilbert-base-uncased", num_outputs=8, bin_outputs=5):
