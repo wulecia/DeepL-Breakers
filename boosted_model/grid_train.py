@@ -5,9 +5,22 @@ from transformers import AutoTokenizer
 from hasoc_model import *
 
 ALL_WEIGHTS = {
-    "A": [(1.6, 1.2), (1.7, 1.2), (1.8, 1.2), (1.7, 1.1), (1.7, 1.3)],
-    "B": [(1.6, 1.3, 1.6), (1.8, 1.4, 1.7), (2.0, 1.5, 1.8)],
-    "C": [(1.0, 1.8), (1.0, 2.0), (1.0, 2.2)]
+    "A": [
+        (1.0, 1.0), (1.5, 1.0), (1.0, 1.5), (1.3, 1.3),
+        (1.6, 1.4), (1.4, 1.6), (1.8, 1.2), (1.2, 1.8),
+        (2.0, 1.0), (1.0, 2.0), (2.5, 1.0), (1.0, 2.5)
+    ],
+    "B": [
+        (1.0, 1.0, 1.0),
+        (1.5, 1.0, 1.0), (1.0, 1.5, 1.0), (1.0, 1.0, 1.5),
+        (1.8, 1.4, 1.8), (2.0, 1.5, 1.8), (2.0, 3.0, 2.0),
+        (1.5, 4.0, 1.5), (2.0, 4.0, 2.0), (2.5, 5.0, 2.5)
+    ],
+    "C": [
+        (1.0, 1.0), (1.5, 1.0), (1.0, 1.5), (2.0, 1.0), (1.0, 2.0),
+        (2.5, 1.0), (1.0, 2.5), (3.0, 1.0), (1.0, 3.0),
+        (4.0, 1.0), (1.0, 4.0)
+    ]
 }
 
 def weight_id(task, weights):
@@ -39,8 +52,8 @@ def train_all():
                 resume=False
             )
 
-            path = f"results/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
-            new_path = f"results/best_boostedmodel_{model_id}.pth"
+            path = f"results/models/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
+            new_path = f"results/models/best_boostedmodel_{model_id}.pth"
             torch.save(model.module.state_dict() if isinstance(model, nn.DataParallel) else model.state_dict(), new_path)
             print(f"Model saved as {new_path}")
 
