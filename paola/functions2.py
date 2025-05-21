@@ -4,6 +4,8 @@ import os
 import torch.nn as nn
 from sklearn.metrics import f1_score, accuracy_score, mean_squared_error, r2_score
 from torch.utils.data import DataLoader
+from datetime import datetime
+import matplotlib.pyplot as plt
 
 # Train for one epoch
 def train_epoch(model, loader, optimizer, loss_fn_num, loss_fn_bin, device):
@@ -57,15 +59,17 @@ def train_with_checkpoint(model, optimizer, train_loader, val_loader, loss_fn_nu
 def train_with_logging(
     model, optimizer, train_loader, val_loader,
     loss_fn_num, loss_fn_bin, device,
-    checkpoint_path="checkpoint2.pt",
     num_extra_epochs=10,
-    log_file=None,
-    plot_graph=True,
     scheduler=None,
     patience=3,
-    save_best_model=True
+    save_best_model=True,
+    plot_graph=True
 ):
     import copy
+    import os
+    import matplotlib.pyplot as plt
+    from datetime import datetime
+
     train_losses, val_losses = [], []
     best_val_loss = float("inf")
     epochs_no_improve = 0
@@ -74,6 +78,7 @@ def train_with_logging(
     for epoch in range(num_extra_epochs):
         model.train()
         total_train_loss = 0
+
         for batch in train_loader:
             optimizer.zero_grad()
             input_ids = batch['input_ids'].to(device)
@@ -113,38 +118,50 @@ def train_with_logging(
         avg_val_loss = total_val_loss / len(val_loader)
         val_losses.append(avg_val_loss)
 
-        print(f"📚 Epoch {epoch + 1}: Train Loss = {avg_train_loss:.4f}, Val Loss = {avg_val_loss:.4f}")
+        print(f"Epoch {epoch + 1}: Train Loss = {avg_train_loss:.4f}, Val Loss = {avg_val_loss:.4f}")
 
         if scheduler is not None:
             scheduler.step(avg_val_loss)
 
-        # === Early stopping & best model saving ===
+        # === Save best model ===
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             best_model_state = copy.deepcopy(model.state_dict())
             epochs_no_improve = 0
+
             if save_best_model:
+                os.makedirs("results", exist_ok=True)
+                timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                checkpoint_path = f"results/best_model_{timestamp}.pth"
                 torch.save(best_model_state, checkpoint_path)
+                print(f"Best model saved as {checkpoint_path}")
         else:
             epochs_no_improve += 1
             if epochs_no_improve >= patience:
-                print(f"⏹️ Early stopping after {epoch+1} epochs")
+                print(f"Early stopping after {epoch + 1} epochs")
                 break
 
-    # === Final model load ===
+    # === Load best model before return ===
     if save_best_model and best_model_state is not None:
-        model.load_state_dict(torch.load(checkpoint_path))
+        model.load_state_dict(best_model_state)
 
+    # === Plot and save loss graph ===
     if plot_graph:
-        import matplotlib.pyplot as plt
+        os.makedirs("results", exist_ok=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        plot_path = f"results/loss_plot_{timestamp}.png"
+
+        plt.figure()
         plt.plot(train_losses, label="Train Loss")
         plt.plot(val_losses, label="Val Loss")
-        plt.legend()
-        plt.title("Training vs Validation Loss")
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
+        plt.title("Training vs Validation Loss")
+        plt.legend()
         plt.grid(True)
-        plt.show()
+        plt.savefig(plot_path)
+        plt.close()
+        print(f"Loss plot saved as {plot_path}")
 
 
 
