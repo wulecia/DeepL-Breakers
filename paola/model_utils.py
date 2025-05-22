@@ -22,10 +22,10 @@ class BERTMultiTaskModel(nn.Module):
         )
 
         self.classifier = nn.Sequential(
-            nn.Linear(hidden_size, 128),
+            nn.Linear(hidden_size, 64),
             nn.ReLU(),
             nn.Dropout(0.3),
-            nn.Linear(128, bin_outputs)
+            nn.Linear(64, bin_outputs)
         )
 
     def forward(self, input_ids, attention_mask):
