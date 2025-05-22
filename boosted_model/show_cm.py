@@ -7,6 +7,8 @@ import numpy as np
 experiment = "load_freeze_grid"
 summary = pd.read_csv(f"./results/{experiment}/grid_metrics/summary_f1_accuracy.csv") 
 confmat_dir = Path(f"./results/{experiment}/grid_metrics")
+save_dir = Path(f"./results/{experiment}/grid_metrics/figures")
+save_dir.mkdir(parents=True, exist_ok=True)
 
 top_models = summary.groupby("task").apply(lambda g: g.nlargest(8, "f1_weighted")).reset_index(drop=True)
 
@@ -20,6 +22,7 @@ for task in top_models["task"].unique():
         model_id = row["model_id"]
         confmat_path = confmat_dir / f"confmat_{model_id}.csv"
         
+        ax = axes[idx]
         if confmat_path.exists():
             confmat = pd.read_csv(confmat_path, header=None).values
             sns.heatmap(confmat, annot=True, fmt="d", cmap="Blues", ax=ax, cbar=False)
@@ -40,4 +43,9 @@ for task in top_models["task"].unique():
     
     fig.suptitle(f"Top 8 Models for Task {task}", fontsize=18, y=1.05)
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    plt.show()
+
+    save_path = save_dir / f"Top_8_Models_Task_{task}.png"
+    fig.savefig(save_path, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+    print(f"Saved: {save_path}")

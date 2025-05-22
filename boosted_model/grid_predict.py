@@ -138,5 +138,5 @@ def run_all_predictions(experiment):
     pd.DataFrame(summary).to_csv(f"results/{experiment}/grid_metrics/summary_f1_accuracy.csv", index=False)
 
 if __name__ == "__main__":
-    experiment = "load_freeze_grid"
+    experiment = "load_grid"
     run_all_predictions(experiment)

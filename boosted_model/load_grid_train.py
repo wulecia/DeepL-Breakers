@@ -84,6 +84,6 @@ def train_all(freeze, experiment):
             print(f"Model saved as {new_path}")
 
 if __name__ == "__main__":
-    freeze = True
-    experiment = "load_freeze_grid"
+    freeze = False
+    experiment = "load_grid"
     train_all(freeze, experiment)
