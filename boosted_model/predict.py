@@ -42,8 +42,8 @@ LABEL_MAPS = {
 }
 
 
-def load_model(task, device):
-    model_path = f"./results/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
+def load_model(task, experiment, device):
+    model_path = f"./results/{experiment}/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
     model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13)
 
     # Load saved weights
@@ -82,7 +82,7 @@ def predict_task(task, model, df, tokenizer, device):
 
 
 all_metrics = []
-def evaluate_predictions(preds, labels, task, class_weights=None):
+def evaluate_predictions(preds, experiment, labels, task, class_weights=None):
     from sklearn.metrics import classification_report, confusion_matrix
 
     report_dict = classification_report(labels, preds, output_dict=True, zero_division=0)
@@ -99,6 +99,7 @@ def evaluate_predictions(preds, labels, task, class_weights=None):
 
     all_metrics.append({
         "Task": task,
+        "Experiment": experiment,
         "Accuracy": accuracy,
         "Weighted F1": f1_score,
         "Class Weights": class_weights.tolist() if class_weights is not None else "None",
@@ -107,13 +108,15 @@ def evaluate_predictions(preds, labels, task, class_weights=None):
 
 
 def main():
+    experiment = "random_init"
+
     df = pd.read_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_test.tsv", sep="\t")
     df = encode_labels(df)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # === Task A ===
     print("\n===== PREDICTING TASK A =====")
-    model_A = load_model("A", device)
+    model_A = load_model("A", experiment, device)
     tokenizer_A = AutoTokenizer.from_pretrained(MODEL_NAMES["A"], use_fast=True)
     preds_A = predict_task("A", model_A, df, tokenizer_A, device)
     df["pred_A"] = preds_A
@@ -122,7 +125,7 @@ def main():
 
     # === Task B ===
     print("\n===== PREDICTING TASK B =====")
-    model_B = load_model("B", device)
+    model_B = load_model("B", experiment, device)
     tokenizer_B = AutoTokenizer.from_pretrained(MODEL_NAMES["B"], use_fast=True)
     df_B = df[df["label_A"] == "HOF"].copy()
     preds_B = predict_task("B", model_B, df_B, tokenizer_B, device)
@@ -130,7 +133,7 @@ def main():
 
     # === Task C ===
     print("\n===== PREDICTING TASK C =====")
-    model_C = load_model("C", device)
+    model_C = load_model("C", experiment, device)
     tokenizer_C = AutoTokenizer.from_pretrained(MODEL_NAMES["C"], use_fast=True)
     df_C = df[df["label_A"] == "HOF"].copy()
     preds_C = predict_task("C", model_C, df_C, tokenizer_C, device)
@@ -138,16 +141,17 @@ def main():
 
 
     # Save all metrics into one file after all tasks are processed
-    os.makedirs("results", exist_ok=True)
+    os.makedirs(f"results/{experiment}", exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_file = f"results/run_{timestamp}.csv"
+    output_file = f"results/{experiment}/run_{timestamp}.csv"
 
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["Task", "Accuracy", "Weighted F1", "Class Weights", "Confusion Matrix"])
+        writer.writerow(["Task", "Experiment", "Accuracy", "Weighted F1", "Class Weights", "Confusion Matrix"])
         for row in all_metrics:
             writer.writerow([
                 row["Task"],
+                row["Experiment"],
                 row["Accuracy"],
                 row["Weighted F1"],
                 row["Class Weights"],
