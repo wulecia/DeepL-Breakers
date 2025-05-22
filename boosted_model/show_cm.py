@@ -5,9 +5,10 @@ from pathlib import Path
 import numpy as np
 
 experiment = "load_freeze_grid"
+
 summary = pd.read_csv(f"./results/{experiment}/grid_metrics/summary_f1_accuracy.csv") 
 confmat_dir = Path(f"./results/{experiment}/grid_metrics")
-save_dir = Path(f"./results/{experiment}/grid_metrics/figures")
+save_dir = Path(f"./results/{experiment}/grid_metrics_final")
 save_dir.mkdir(parents=True, exist_ok=True)
 
 top_models = summary.groupby("task").apply(lambda g: g.nlargest(8, "f1_weighted")).reset_index(drop=True)
@@ -24,7 +25,7 @@ for task in top_models["task"].unique():
         
         ax = axes[idx]
         if confmat_path.exists():
-            confmat = pd.read_csv(confmat_path, header=None).values
+            confmat = pd.read_csv(confmat_path, header=None, skiprows=1).values
             sns.heatmap(confmat, annot=True, fmt="d", cmap="Blues", ax=ax, cbar=False)
             
             title_line1 = model_id
