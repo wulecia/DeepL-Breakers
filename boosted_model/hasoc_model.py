@@ -190,7 +190,7 @@ class WeightedFocalLossTrainer(Trainer):
         return (loss, logits, labels)
 
 
-def train_model(task, model_wrapper, dataset, tokenizer, resume=False, freeze=False):
+def train_model(task, experiment, model_wrapper, dataset, tokenizer, resume=False, freeze=False):
     model = model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper
     output_dir = f"./results/results_{task}_{model.model_name.split('/')[-1]}"
     logging_dir = f"./logs_{task}_{model.model_name.split('/')[-1]}"
@@ -234,7 +234,7 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=False, freeze=Fa
         remove_unused_columns=False
     )
 
-    if freeze=True:
+    if freeze==True:
         model.freeze_transformer()
 
     trainer = WeightedFocalLossTrainer(
@@ -249,10 +249,10 @@ def train_model(task, model_wrapper, dataset, tokenizer, resume=False, freeze=Fa
 
     trainer.train(resume_from_checkpoint=checkpoint_path if checkpoint_path else None)
 
-    trainer.save_model(f"./results/best_boostedmodel_{task}_{model.model_name.split('/')[-1]}")
+    trainer.save_model(f"./results/models/{experiment}/best_boostedmodel_{task}_{model.model_name.split('/')[-1]}")
     torch.save(
         model_wrapper.state_dict(),
-        f"./results/best_boostedmodel_{task}_{model.model_name.split('/')[-1]}.pth"
+        f"./results/models/{experiment}/best_boostedmodel_{task}_{model.model_name.split('/')[-1]}.pth"
     )
     print(f"Task {task} training complete.")
     log_metrics_to_csv(trainer.state.log_history, task)
