@@ -26,7 +26,7 @@ ALL_WEIGHTS = {
 def weight_id(task, weights):
     return f"{task}_{'-'.join([str(w).replace('.', '') for w in weights])}"
 
-def train_all():
+def train_all(freeze, experiment):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     for task in ["A", "B", "C"]:
@@ -46,16 +46,20 @@ def train_all():
 
             train_model(
                 task=task,
+                experiment = experiment,
                 model_wrapper=model,
                 dataset=dataset,
                 tokenizer=tokenizer,
-                resume=False
+                resume=False,
+                freeze= freeze
             )
 
-            path = f"results/models/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
-            new_path = f"results/models/best_boostedmodel_{model_id}.pth"
+            path = f"results/models/{experiment}/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
+            new_path = f"results/models/{experiment}/best_boostedmodel_{model_id}.pth"
             torch.save(model.module.state_dict() if isinstance(model, nn.DataParallel) else model.state_dict(), new_path)
             print(f"Model saved as {new_path}")
 
 if __name__ == "__main__":
-    train_all()
+    freeze = False
+    experiment = "grid"
+    train_all(freeze, experiment)

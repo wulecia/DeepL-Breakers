@@ -36,13 +36,10 @@ LOAD_DICT_PATH = {
     "C": "best_model_C_hateBERT.pth"
 }
 
-freeze = True
-experiment = "load_freeze_grid"
-
 def weight_id(task, weights):
     return f"{task}_{'-'.join([str(w).replace('.', '') for w in weights])}"
 
-def train_all():
+def train_all(freeze, experiment):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     for task in ["A", "B", "C"]:
@@ -87,4 +84,6 @@ def train_all():
             print(f"Model saved as {new_path}")
 
 if __name__ == "__main__":
-    train_all()
+    freeze = True
+    experiment = "load_freeze_grid"
+    train_all(freeze, experiment)

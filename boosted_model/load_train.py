@@ -15,6 +15,7 @@ NUM_LABELS = {"A": 2, "B": 3, "C": 2}
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 freeze = False
+experiment = "load"
 
 # === TASK A ===
 print("\n=== TRAINING TASK A ===")
@@ -39,7 +40,7 @@ model_A.class_weights = class_weights_A
 if torch.cuda.device_count() > 1:
     print("[A] Using multiple GPUs")
     model_A = nn.DataParallel(model_A)
-train_model(task, model_A, dataset_A, tokenizer_A, freeze=freeze)
+train_model(task, experiment, model_A, dataset_A, tokenizer_A, freeze=freeze)
 
 # === TASK B ===
 print("\n=== TRAINING TASK B ===")
@@ -63,7 +64,7 @@ model_B.class_weights = class_weights_B
 if torch.cuda.device_count() > 1:
     print("[B] Using multiple GPUs")
     model_B = nn.DataParallel(model_B)
-train_model(task, model_B, dataset_B, tokenizer_B, freeze=freeze)
+train_model(task, experiment, model_B, dataset_B, tokenizer_B, freeze=freeze)
 
 # === TASK C ===
 print("\n=== TRAINING TASK C ===")
@@ -87,4 +88,4 @@ model_C.class_weights = class_weights_C
 if torch.cuda.device_count() > 1:
     print("[C] Using multiple GPUs")
     model_C = nn.DataParallel(model_C)
-train_model(task, model_C, dataset_C, tokenizer_C, freeze=freeze)
+train_model(task, experiment, model_C, dataset_C, tokenizer_C, freeze=freeze)
