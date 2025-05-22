@@ -52,8 +52,8 @@ LABELS = {
 def weight_id(task, weights):
     return f"{task}_{'-'.join([str(w).replace('.', '') for w in weights])}"
 
-def load_model(task, model_id, device):
-    model_path = f"results/models/best_boostedmodel_{model_id}.pth"
+def load_model(task, experiment, model_id, device):
+    model_path = f"results/models/{experiment}/best_boostedmodel_{model_id}.pth"
     model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13)
     state_dict = torch.load(model_path, map_location=device)
     model.load_state_dict(state_dict)
@@ -64,7 +64,7 @@ def get_encoded_inputs(df, tokenizer):
     extra_feats = torch.tensor(df[EXTRA_FEATURES].values, dtype=torch.float32)
     return encodings, extra_feats
 
-def predict_and_eval(task, model, df, tokenizer, label_col, prefix):
+def predict_and_eval(task, experiment, model, df, tokenizer, label_col, prefix):
     encodings, extra_feats = get_encoded_inputs(df, tokenizer)
     device = next(model.parameters()).device
     input_ids = encodings["input_ids"].to(device)
@@ -80,9 +80,9 @@ def predict_and_eval(task, model, df, tokenizer, label_col, prefix):
     cm = confusion_matrix(labels, preds)
 
     # Save results
-    os.makedirs("results/grid_metrics", exist_ok=True)
-    pd.DataFrame(cm).to_csv(f"results/grid_metrics/confmat_{prefix}.csv", index=False)
-    with open(f"results/grid_metrics/report_{prefix}.csv", "w") as f:
+    os.makedirs(f"results/{experiment}/grid_metrics", exist_ok=True)
+    pd.DataFrame(cm).to_csv(f"results/{experiment}/grid_metrics/confmat_{prefix}.csv", index=False)
+    with open(f"results/{experiment}/grid_metrics/report_{prefix}.csv", "w") as f:
         f.write(pd.DataFrame(report).to_csv())
 
     # Optional: Save confusion matrix image
@@ -92,11 +92,11 @@ def predict_and_eval(task, model, df, tokenizer, label_col, prefix):
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
     plt.tight_layout()
-    plt.savefig(f"results/grid_metrics/confmat_{prefix}.png")
+    plt.savefig(f"results/{experiment}/grid_metrics/confmat_{prefix}.png")
     plt.close()
     return report["weighted avg"]["f1-score"], report["macro avg"]["f1-score"], report["accuracy"]
 
-def run_all_predictions():
+def run_all_predictions(experiment):
     df = pd.read_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_test.tsv", sep="\t")
     df = encode_labels(df)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -108,7 +108,7 @@ def run_all_predictions():
         for weights in weight_list:
             model_id = weight_id(task, weights)
             print(f"\n=== EVALUATING {model_id} ===")
-            model = load_model(task, model_id, device)
+            model = load_model(task, experiment, model_id, device)
 
             if task == "A":
                 df_task = df.copy()
@@ -123,10 +123,11 @@ def run_all_predictions():
                 label_col = "label_A_enc"
 
             df_task = df_task.dropna(subset=[label_col])
-            f1_weighted, f1_macro, acc = predict_and_eval(task, model, df_task, tokenizer, label_col, model_id)
+            f1_weighted, f1_macro, acc = predict_and_eval(task, experiment, model, df_task, tokenizer, label_col, model_id)
 
             summary.append({
                 "task": task,
+                "experiment": experiment,
                 "weights": weights,
                 "model_id": model_id,
                 "f1_weighted": f1_weighted,
@@ -134,7 +135,8 @@ def run_all_predictions():
                 "accuracy": acc
             })
 
-    pd.DataFrame(summary).to_csv("results/grid_metrics/summary_f1_accuracy.csv", index=False)
+    pd.DataFrame(summary).to_csv(f"results/{experiment}/grid_metrics/summary_f1_accuracy.csv", index=False)
 
 if __name__ == "__main__":
-    run_all_predictions()
+    experiment = "load_freeze_grid"
+    run_all_predictions(experiment)
