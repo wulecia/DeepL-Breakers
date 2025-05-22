@@ -192,8 +192,8 @@ class WeightedFocalLossTrainer(Trainer):
 
 def train_model(task, experiment, model_wrapper, dataset, tokenizer, resume=False, freeze=False):
     model = model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper
-    output_dir = f"./results/results_{task}_{model.model_name.split('/')[-1]}"
-    logging_dir = f"./logs_{task}_{model.model_name.split('/')[-1]}"
+    output_dir = f"./results/{experiment}/results_{task}_{model.model_name.split('/')[-1]}"
+    logging_dir = f"./results/{experiment}/logs_{task}_{model.model_name.split('/')[-1]}"
 
     os.makedirs(output_dir, exist_ok=True)
 
