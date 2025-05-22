@@ -120,7 +120,7 @@ def main():
     tokenizer_A = AutoTokenizer.from_pretrained(MODEL_NAMES["A"], use_fast=True)
     preds_A = predict_task("A", model_A, df, tokenizer_A, device)
     df["pred_A"] = preds_A
-    evaluate_predictions(preds_A, df["label_A_enc"].values, "A", model_A.class_weights)
+    evaluate_predictions(preds_A, experiment, df["label_A_enc"].values, "A", model_A.class_weights)
 
 
     # === Task B ===
@@ -129,7 +129,7 @@ def main():
     tokenizer_B = AutoTokenizer.from_pretrained(MODEL_NAMES["B"], use_fast=True)
     df_B = df[df["label_A"] == "HOF"].copy()
     preds_B = predict_task("B", model_B, df_B, tokenizer_B, device)
-    evaluate_predictions(preds_B, df_B["label_B_enc"].values, "B", model_B.class_weights)
+    evaluate_predictions(preds_B, experiment, df_B["label_B_enc"].values, "B", model_B.class_weights)
 
     # === Task C ===
     print("\n===== PREDICTING TASK C =====")
@@ -137,7 +137,7 @@ def main():
     tokenizer_C = AutoTokenizer.from_pretrained(MODEL_NAMES["C"], use_fast=True)
     df_C = df[df["label_A"] == "HOF"].copy()
     preds_C = predict_task("C", model_C, df_C, tokenizer_C, device)
-    evaluate_predictions(preds_C, df_C["label_C_enc"].values, "C", model_C.class_weights)
+    evaluate_predictions(preds_C, experiment, df_C["label_C_enc"].values, "C", model_C.class_weights)
 
 
     # Save all metrics into one file after all tasks are processed
