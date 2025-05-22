@@ -28,7 +28,7 @@ model_A.class_weights = class_weights_A
 if torch.cuda.device_count() > 1:
     print("[A] Using multiple GPUs")
     model_A = nn.DataParallel(model_A)
-train_model(task, model_A, dataset_A, tokenizer_A, freeze=freeze)
+train_model(task, experiment, model_A, dataset_A, tokenizer_A, freeze=freeze)
 
 # === TASK B ===
 print("\n=== TRAINING TASK B ===")
@@ -42,7 +42,7 @@ model_B.class_weights = class_weights_B
 if torch.cuda.device_count() > 1:
     print("[B] Using multiple GPUs")
     model_B = nn.DataParallel(model_B)
-train_model(task, model_B, dataset_B, tokenizer_B, freeze=freeze)
+train_model(task, experiment, model_B, dataset_B, tokenizer_B, freeze=freeze)
 
 # === TASK C ===
 print("\n=== TRAINING TASK C ===")
