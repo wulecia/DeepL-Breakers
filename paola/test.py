@@ -9,7 +9,7 @@ import sys
 from sklearn.metrics import f1_score, accuracy_score, mean_squared_error, r2_score
 
 # command to use :
-# python test.py results/best_model_2025-05-21_14-23-53.pth
+# python3 test.py best_model.pth
 
 def main(model_path):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
