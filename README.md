@@ -47,11 +47,11 @@ BERTMultiTaskModel, RoBERTa, HateBERT
 
 ## Running
 - Move these to the folder "paola":  
-python3 -m gdown https://drive.google.com/uc?id=10hcRYw1qxgabsqiXMVbO-qF4LmaRJM4l   
+python3 -m gdown https://drive.google.com/uc?id=10hcRYw1qxgabsqiXMVbO-qF4LmaRJM4l  
 python3 -m gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW  
-- Move this to the folder "paola/results":
-python3 -m gdown https://drive.google.com/uc?1NYlv9REz6C9Ubsx-i-vaXgBPPhuVGfps=1AbcD3FgHxyz12345678
-unzip best_model_2025-05-21_14-23-53.zip
+- Move this to the folder "paola/results":  
+python3 -m gdown https://drive.google.com/uc?1NYlv9REz6C9Ubsx-i-vaXgBPPhuVGfps=1AbcD3FgHxyz12345678  
+unzip best_model_2025-05-21_14-23-53.zip  
 - Move these to the folder "coline":  
 python3 -m gdown https://drive.google.com/uc?id=1PCzrY1vg6NcG_T9ogi46swyufyEOtOg9  
 python3 -m gdown https://drive.google.com/uc?id=1qj0GclRw8y3Y6jSOnyBS8rVd23K-Ebqr  
@@ -63,14 +63,14 @@ python3 -m gdown https://drive.google.com/uc?id=1eCx2Lmbhh_eVAbyy-lpO8QSl3jSI6Fc
 - `boosted_model/train.py` to train the fine-tuned model on Hasoc Dataset (4).
 - `boosted_model/predict.py` to evaluate the fine-tuned model on Hasoc Dataset (4).
 
-- Move these to the folder "hasoc_model/results/models":
-python3 -m gdown https://drive.google.com/uc?id=17o32Sa6Mb7Soz21KEziMcPgfybHAtLmt
-python3 -m gdown https://drive.google.com/uc?id=10tkbyTi3DXT8bDe5A2EJuJotJVxa-Qgn
-python3 -m gdown https://drive.google.com/uc?id=1Q2oC3KpcyuTujbn15ibl41k6OvKzyB6S
-unzip best_no_features_A_roberta-base_full.pt.zip
-unzip best_no_features_B_hateBERT_full.pt.zip
+- Move these to the folder "hasoc_model/results/models":  
+python3 -m gdown https://drive.google.com/uc?id=17o32Sa6Mb7Soz21KEziMcPgfybHAtLmt  
+python3 -m gdown https://drive.google.com/uc?id=10tkbyTi3DXT8bDe5A2EJuJotJVxa-Qgn  
+python3 -m gdown https://drive.google.com/uc?id=1Q2oC3KpcyuTujbn15ibl41k6OvKzyB6S  
+unzip best_no_features_A_roberta-base_full.pt.zip  
+unzip best_no_features_B_hateBERT_full.pt.zip  
 unzip best_no_features_C_hateBERT_full.pt.zip
-- 
+
 ## Ideas of improvement
 
 ### Preprocessing
