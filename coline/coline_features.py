@@ -58,7 +58,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model_paola = Paola()
 
 # Load weights BEFORE wrapping in DataParallel
-state_dict = torch.load("../paola/results/best_model_2025-05-21_14-23-53.pth", map_location=device, weights_only=True)
+state_dict = torch.load("../paola/best_model.pth", map_location=device, weights_only=True)
 model_paola.load_state_dict(state_dict)
 
 # Then wrap in DataParallel if multiple GPUs
