@@ -43,7 +43,7 @@ LABEL_MAPS = {
 
 
 def load_model(task, experiment, device):
-    model_path = f"./results/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
+    model_path = f"./results/{experiment}/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
     model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13)
 
     # Load saved weights
@@ -143,7 +143,7 @@ def main():
     # Save all metrics into one file after all tasks are processed
     os.makedirs(f"results", exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_file = f"results/run_{timestamp}.csv"
+    output_file = f"results/{experiment}/run_{timestamp}.csv"
 
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)

@@ -9,7 +9,7 @@ This project explores hate speech and offensive language detection using transfo
 
 ### Hate Speech Classification Models:
 3. Train RoBERTa & HateBERT models on HASOC Sub-tasks A, B, and C: Using the HASOC 2019 dataset, we train classification models (RoBERTa and HateBERT) to solve the three HASOC subtasks (A, B, and C).
-4. Fine-tune with 12 additional features to boost performance: Then we fine-tune these models, by integrating the inferred features from the first stage into the classification models to improve performance.
+4. Fine-tune with 13 additional features to boost performance: Then we fine-tune these models, by integrating the inferred features from the first stage into the classification models to improve performance.
 
 ## Subtasks
 The HASOC 2019 dataset contains tweets in English, German, and Hindi. We focus on English tweets across three subtasks:
