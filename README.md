@@ -72,9 +72,9 @@ unzip best_no_features_B_hateBERT_full.pt.zip
 unzip best_no_features_C_hateBERT_full.pt.zip
 
 - Move these to the folder "coline":  
-python3 -m gdown https://drive.google.com/uc?id=18OW17kQ8XgqvimwHyvl3O_MbAwX4kd_z  
-python3 -m gdown https://drive.google.com/uc?id=16uZ4lB_f8XdscL3GKoUghZa3BdPx3mNH  
-python3 -m gdown https://drive.google.com/uc?id=1CYYjj79QdOJgxPAespgMGw4wueUNFiMS
+python3 -m gdown https://drive.google.com/uc?id=1Uxwq9xVr1UHNXrXvd1_Rewz1Fe-QHevs
+python3 -m gdown https://drive.google.com/uc?id=1INMtTKjdX6LPENm-ktBuO5NPGEuKJyph
+python3 -m gdown https://drive.google.com/uc?id=1G6ZK1NXU_0FwuRYvZFy_tyj5vqdjMjmP
 
 ## Ideas of improvement
 
