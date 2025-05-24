@@ -29,11 +29,17 @@ LOAD_DICT_KEY = {
     "B": "bert.",
     "C": "bert."
 }
-
+'''
 LOAD_DICT_PATH = {
     "A": "best_model_A_roberta-base.pth",
     "B": "best_model_B_hateBERT.pth",
     "C": "best_model_C_hateBERT.pth"
+}'''
+
+LOAD_DICT_PATH = {
+    "A": "best_no_features_A_roberta-base_full.pt",
+    "B": "best_no_features_B_hateBERT_full.pt",
+    "C": "best_no_features_C_hateBERT_full.pt"
 }
 
 def weight_id(task, weights):
@@ -50,8 +56,10 @@ def train_all(freeze, experiment):
             model_id = weight_id(task, weights)
             print(f"\n=== TRAINING {task} with weights {weights} ===")
             model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
+
+            model_wrapper = torch.load(f"../coline/__MACOSX/._{LOAD_DICT_PATH[task]}", map_location=device)
+            state_dict = model_wrapper.state_dict()
             
-            state_dict = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device, weights_only=True)
             new_state_dict = OrderedDict()
             for k, v in state_dict.items():
                 new_key = k
@@ -85,5 +93,5 @@ def train_all(freeze, experiment):
 
 if __name__ == "__main__":
     freeze = False
-    experiment = "load_grid"
+    experiment = "new_load_grid"
     train_all(freeze, experiment)
