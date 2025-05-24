@@ -71,6 +71,11 @@ unzip best_no_features_A_roberta-base_full.pt.zip
 unzip best_no_features_B_hateBERT_full.pt.zip  
 unzip best_no_features_C_hateBERT_full.pt.zip
 
+- Move these to the folder "coline":  
+python3 -m gdown https://drive.google.com/uc?id=18OW17kQ8XgqvimwHyvl3O_MbAwX4kd_z  
+python3 -m gdown https://drive.google.com/uc?id=16uZ4lB_f8XdscL3GKoUghZa3BdPx3mNH  
+python3 -m gdown https://drive.google.com/uc?id=1CYYjj79QdOJgxPAespgMGw4wueUNFiMS
+
 ## Ideas of improvement
 
 ### Preprocessing
