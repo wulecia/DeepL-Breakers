@@ -79,13 +79,11 @@ def predict_and_eval(task, experiment, model, df, tokenizer, label_col, prefix):
     report = classification_report(labels, preds, output_dict=True, zero_division=0)
     cm = confusion_matrix(labels, preds)
 
-    # Save results
     os.makedirs(f"results/{experiment}/grid_metrics", exist_ok=True)
     pd.DataFrame(cm).to_csv(f"results/{experiment}/grid_metrics/confmat_{prefix}.csv", index=False)
     with open(f"results/{experiment}/grid_metrics/report_{prefix}.csv", "w") as f:
         f.write(pd.DataFrame(report).to_csv())
 
-    # Optional: Save confusion matrix image
     plt.figure(figsize=(6, 4))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
     plt.title(f"Confusion Matrix - {prefix}")
