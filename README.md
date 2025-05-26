@@ -4,12 +4,16 @@
 This project explores hate speech and offensive language detection using transformer-based models. It proceeds in two main stages:
 
 ### Feature Extraction Model:
-1. Train 13-label model on base dataset: We first train a BERTMultiTaskModel model on a labeled [dataset from Berkeley](#ref1) containing 13 distinct categories (8 numerical: *sentiment*, *respect*, *insult*, *humiliate*, *status*, *dehumanize*, *attack_defend*, *hatespeech*; 5 binary: *target_race*, *target_religion*, *target_origin*, *target_gender*, *target_sexuality*).
-2. Infer 13 features for each HASOC tweet: After achieving satisfying performance, we apply this model to a second dataset — [HASOC 2019](#ref2) — to annotate tweets with these 13 inferred features.
+1. Train a Multitask DistilBERT on Berkeley dataset: We first train a BERTMultiTaskModel model on a labeled [dataset from Berkeley](#ref1) containing 13 distinct categories (8 numerical: *sentiment*, *respect*, *insult*, *humiliate*, *status*, *dehumanize*, *attack_defend*, *hatespeech*; 5 binary: *target_race*, *target_religion*, *target_origin*, *target_gender*, *target_sexuality*).
+2. Infer 13 features for each HASOC tweet: After achieving satisfying performance, we apply this model to a second dataset — [HASOC 2019](#ref2) — to annotate tweets with these 13 inferred features. 
 
 ### Hate Speech Classification Models:
-3. Train RoBERTa & HateBERT models on HASOC Sub-tasks A, B, and C: Using the HASOC 2019 dataset, we train classification models (RoBERTa and HateBERT) to solve the three HASOC subtasks (A, B, and C).
-4. Fine-tune with 13 additional features to boost performance: Then we fine-tune these models, by integrating the 13 inferred features from the first stage into the classification models to improve performance on the 3 tasks.
+3. Train RoBERTa and HateBERT models on Hasoc dataset: We use the HASOC dataset to train a RoBERTa model for Subtask A, and HateBERT models for Subtasks B and C (V1 models). To address class imbalances, we apply subtask-specific class weights, using the WeightedFocalLossTrainer to emphasize harder-to-classify examples and improve performance on underrepresented classes.
+
+4. Train several models on Hasoc dataset with 13 features to boost performance: We coded 3 models (V2 models) with same architecture, integrating the 13 inferred features from the first stage into the classification models, with different class weighting strategies. The V2 models are obtained by fine-tuning each V1 model with 3 strategies:  
+- V2.1: Using pretrained RoBERTa and HateBERT transformer parts.  
+- V2.2: Loading fine-tuned parameters (weights and biases) from the best V1 models to transformer layers, without freezing.  
+- V2.3: Loading fine-tuned parameters (weights and biases) from the best V1 models to transformer layers and freezing them.
 
 ## Subtasks
 The HASOC 2019 dataset contains tweets in English, German, and Hindi. We focus on English tweets across three subtasks:
@@ -123,7 +127,7 @@ Optional:
 Train on complementary datasets  
 Extend to multilingual models  
 Perform feature ablation studies  
-Test robustness across tweet platforms (Twitter, YouTube, Instagram...)  
+Test robustness across tweet platforms (TikTok, YouTube, Instagram...)  
 Preprocess tweets (stemming, lemmatization...)
 
 ## References
