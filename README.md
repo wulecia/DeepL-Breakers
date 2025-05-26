@@ -36,6 +36,63 @@ TIN – Targeted Insult: Direct insult/threat against individuals, groups, or ot
 
 UNT – Untargeted: Profane or aggressive language without a specific target.
 
+## 📁 Repository Structure
+
+```plaintext
+.
+├── berkeley_model                  # Model for feature generation with Berkeley dataset
+│   ├── data
+│   │   └── measuring-hate-speech.parquet  # Parquet file with Berkeley data
+│   ├── results                     # Plots and test results
+│   │   ├── loss_plot_*.png             # Loss plots over training
+│   │   └── test_results_*.csv         # Test set evaluation results
+│   ├── best_Berkeley_model.pth     # Best model weights
+│   ├── functions2.py               # Supporting functions
+│   ├── model_utils.py              # Utility functions for the model
+│   ├── test.py                     # Script to test the model
+│   ├── train.py                    # Script to train the model
+│   ├── try.py                      # Experimentation script to see output for example comments
+│   └── visualize_data.ipynb        # Notebook to visualize data
+│
+├── hasoc_dataset                   # Dataset for HASOC task
+│   ├── .ipynb_checkpoints/         # Jupyter auto-saves
+│   ├── test-checkpoint.tsv         # Checkpoint test data
+│   ├── train-checkpoint.tsv        # Checkpoint train data
+│   ├── test_extra_features.tsv     # Extra features for test data
+│   ├── test.tsv                    # Test data
+│   ├── train_extra_features.tsv    # Extra features for train data
+│   └── train.tsv                   # Train data
+│
+├── hasoc_model_base                # Baseline model for HASOC
+│   ├── hasoc_model_base.py         # Model architecture
+│   ├── predict.py                  # Prediction script
+│   └── train.py                    # Training script
+│
+├── hasoc_model_boosted             # Boosted model for HASOC
+│   ├── results
+│   │   ├── grid_metrics/               # Grid search results
+│   │   │   ├── run_*.csv
+│   ├── grid_predict.py             # Grid search prediction
+│   ├── grid_train.py               # Grid search training
+│   ├── hasoc_model_boosted.py      # Boosted model architecture
+│   ├── load_grid_train.py          # Load training data for grid search
+│   ├── load_train.py               # Load standard training data
+│   ├── predict.py                  # Prediction script
+│   ├── print_results.ipynb         # Notebook for result visualization
+│   ├── show_cm.py                  # Show confusion matrix
+│   └── train.py                    # Training script
+│
+├── new_features                    # Additional features
+│   ├── add_extra_features.ipynb    # Notebook to add extra features
+│   ├── add_extra_features.py       # Script to add extra features
+│   └── features_descr_analysis.py  # Analyze feature descriptions
+│
+├── LICENSE_berkeley                # License for Berkeley dataset
+├── LICENSE_hasoc                   # License for HASOC dataset
+├── README.md                       # This file
+└── requirements.txt                # Required Python packages
+
+
 
 ## Implementation 
 
