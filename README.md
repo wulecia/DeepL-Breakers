@@ -93,9 +93,6 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 └── requirements.txt                # Required Python packages
 ```
 
-
-## Implementation 
-
 ## Running
 - Move this to the folder "berkeley_model":  
 python3 -m gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW  
