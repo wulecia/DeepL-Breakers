@@ -36,7 +36,7 @@ TIN – Targeted Insult: Direct insult/threat against individuals, groups, or ot
 
 UNT – Untargeted: Profane or aggressive language without a specific target.
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```plaintext
 .
