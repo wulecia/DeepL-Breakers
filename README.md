@@ -79,13 +79,13 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 │   ├── load_train.py               # Load standard training data
 │   ├── predict.py                  # Prediction script
 │   ├── print_results.ipynb         # Notebook for result visualization
-│   ├── show_cm.py                  # Show confusion matrix
+│   ├── show_cm.py                  # Show confusion matrices
 │   └── train.py                    # Training script
 │
 ├── new_features                    # Additional features
 │   ├── add_extra_features.ipynb    # Notebook to add extra features
 │   ├── add_extra_features.py       # Script to add extra features
-│   └── features_descr_analysis.py  # Analyze feature descriptions
+│   └── features_descr_analysis.py  # Descriptive analyze of the features
 │
 ├── LICENSE_berkeley                # License for Berkeley dataset
 ├── LICENSE_hasoc                   # License for HASOC dataset
