@@ -98,6 +98,7 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 ```
 
 ## Running
+First, download all pretrained models:  
 - Move this to the folder "berkeley_model":  
 python3 -m gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW  
 - Move these to the folder "hasoc_model_base":  
@@ -105,9 +106,12 @@ python3 -m gdown https://drive.google.com/uc?id=1o1b4vRKceIVEPSfXUrcrlSFvD6nQYc-
 python3 -m gdown https://drive.google.com/uc?id=1Wem7CyJh8T-gb-ct8fLIejsPV_5frJls  
 python3 -m gdown https://drive.google.com/uc?id=1_65mHOetpg9Z1S3X5zoAtplSZyyWlly3  
 
+Then, install the requirements:  
 - If you are using a GPU, run `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126` (replace cu126 with your CUDA version).  
 - If you are using a CPU-only, run `pip install torch torchvision torchaudio`.
-- Install requirements using `pip3 install -r requirements.txt`  
+- Install requirements using `pip3 install -r requirements.txt`
+
+Finally, run the whole project:  
 - `berkeley_model/...py` to train [BertMultiTasks model](#feature-extraction-model) on Berkeley Dataset (1).  
 - `new_features/add_extra_features.py` to infer the 13 features to Hasoc Dataset (2).  
 - `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate [baseline RoBERTa and HateBERT models](#hate-speech-classification-models) on Hasoc Dataset (3).  
