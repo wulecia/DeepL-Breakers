@@ -1,10 +1,9 @@
-# === grid_train.py ===
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer
-from hasoc_model_boosted import *
+from hasoc_model import *
 from collections import OrderedDict
-
+'''
 ALL_WEIGHTS = {
     "A": [
         (1.0, 1.0), (1.5, 1.0), (1.0, 1.5), (1.3, 1.3),
@@ -22,6 +21,19 @@ ALL_WEIGHTS = {
         (2.5, 1.0), (1.0, 2.5), (3.0, 1.0), (1.0, 3.0),
         (4.0, 1.0), (1.0, 4.0)
     ]
+}'''
+
+ALL_WEIGHTS = {
+    "A": [
+        (1.7, 0.9)
+    ],
+    "B": [(1.9, 4.0, 1.9), (2.0, 4.0, 2.0), (1.8, 4.0, 1.8), (1.8, 4.1, 1.8),
+        (1.6, 4.0, 1.6), (2.0, 4.1, 2.0), (2.2, 4.0, 2.2), (2.2, 4.1, 2.2), 
+        (2.0, 4.2, 2.0), (2.0, 3.9, 2.0)
+    ],
+    "C": [
+        (1.0, 2.0)
+    ]
 }
 
 LOAD_DICT_KEY = {
@@ -29,18 +41,18 @@ LOAD_DICT_KEY = {
     "B": "bert.",
     "C": "bert."
 }
-'''
+
 LOAD_DICT_PATH = {
     "A": "best_model_A_roberta-base.pth",
     "B": "best_model_B_hateBERT.pth",
     "C": "best_model_C_hateBERT.pth"
-}'''
-
+}
+'''
 LOAD_DICT_PATH = {
     "A": "best_no_features_A_roberta-base_full.pt",
     "B": "best_no_features_B_hateBERT_full.pt",
     "C": "best_no_features_C_hateBERT_full.pt"
-}
+}'''
 
 def weight_id(task, weights):
     return f"{task}_{'-'.join([str(w).replace('.', '') for w in weights])}"
@@ -55,10 +67,11 @@ def train_all(freeze, experiment):
         for weights in ALL_WEIGHTS[task]:
             model_id = weight_id(task, weights)
             print(f"\n=== TRAINING {task} with weights {weights} ===")
-            model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
+            model = CombinedModelNoFeatures(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
-            model_wrapper = torch.load(f"../coline/__MACOSX/._{LOAD_DICT_PATH[task]}", map_location=device)
-            state_dict = model_wrapper.state_dict()
+            #model_wrapper = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device)
+            #state_dict = model_wrapper.state_dict()
+            state_dict = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device, weights_only = True)
             
             new_state_dict = OrderedDict()
             for k, v in state_dict.items():
@@ -93,5 +106,5 @@ def train_all(freeze, experiment):
 
 if __name__ == "__main__":
     freeze = False
-    experiment = "new_load_grid"
+    experiment = "new2_load_grid"
     train_all(freeze, experiment)
