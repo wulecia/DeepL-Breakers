@@ -111,11 +111,11 @@ python3 -m gdown https://drive.google.com/uc?id=1_65mHOetpg9Z1S3X5zoAtplSZyyWlly
 - `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate baseline RoBERTa and HateBERT models on Hasoc Dataset (3).  
 
 Depending on the experiment, you have to run different files for training the fine-tuned models on Hasoc Dataset (4):  
-- `hasoc_model_boosted/train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with V2.1 model.  
-- `hasoc_model_boosted/grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have a grid of specific class weights to try V2.1 model.  
-- `hasoc_model_boosted/load_train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with V2.2 or V2.3 model.
-- `hasoc_model_boosted/load_grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have a grid of specific class weights to try V2.2 or V2.3 model.  
-For the last two, change `freeze` and `experiment` arguments to choose between V2.2 or V2.3 models.  
+- `hasoc_model_boosted/train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with [V2.1 model](#hate-speech-classification-models).  
+- `hasoc_model_boosted/grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have a grid of specific class weights to try with [V2.1 model](#hate-speech-classification-models).  
+- `hasoc_model_boosted/load_train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with [V2.2 or V2.3 model](#hate-speech-classification-models).
+- `hasoc_model_boosted/load_grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have a grid of specific class weights to try with [V2.2 or V2.3 model](#hate-speech-classification-models).  
+For the last two, change `freeze` and `experiment` arguments to choose between [V2.2 or V2.3 models](#hate-speech-classification-models).  
 
 Optional:  
 - `new_features/features_descr_analysis.py` to perform a descriptive analysis of the 13 features.  
