@@ -116,7 +116,7 @@ Finally, run the whole project:
 - `new_features/add_extra_features.py` to infer the 13 features to Hasoc Dataset (2).  
 - `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate [baseline RoBERTa and HateBERT models](#hate-speech-classification-models) on Hasoc Dataset (3).  
 
-  Depending on the experiment, you have to run different files for training the fine-tuned models on Hasoc Dataset (4):  
+  Depending on the experiment, you have to run different files for training the fine-tuned models on augmented Hasoc Dataset (4):  
 - `hasoc_model_boosted/train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with [V2.1 model](#hate-speech-classification-models).  
 - `hasoc_model_boosted/grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have a grid of specific class weights to try with [V2.1 model](#hate-speech-classification-models).  
 - `hasoc_model_boosted/load_train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with [V2.2 or V2.3 model](#hate-speech-classification-models).
