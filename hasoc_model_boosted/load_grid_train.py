@@ -32,9 +32,9 @@ LOAD_DICT_KEY = {
 }
 
 LOAD_DICT_PATH = {
-    "A": "best_no_features_A_roberta-base_full.pt",
-    "B": "best_model_B_hateBERT.pth",
-    "C": "best_no_features_C_hateBERT_full.pt"
+    "A": "best_no_features_A_roberta-base_full.pth",
+    "B": "best_no_features_B_hateBERT_full.pth",
+    "C": "best_no_features_C_hateBERT_full.pth"
 }
 
 def weight_id(task, weights):
