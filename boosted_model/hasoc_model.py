@@ -66,28 +66,28 @@ def prepare_dataset(task, split="train"):
 def compute_class_weights(labels, num_labels, task=None, weight_factors=None):
     class_weights = compute_class_weight(class_weight='balanced', classes=np.arange(num_labels), y=labels)
     class_weights = torch.tensor(class_weights, dtype=torch.float)
-
-    """
-    if task == "A":
-        class_weights[0] *= 1.7
-        class_weights[1] *= 1.2
-
-    if task == "B":
-        class_weights[0] *= 1.8
-        class_weights[1] *= 1.4
-        class_weights[2] *= 1.7
-
-    if task == "C":
-        class_weights[0] *= 1
-        class_weights[1] *= 2
-
-    return class_weights
-    """
+    
     if weight_factors:
         for i, factor in enumerate(weight_factors):
             class_weights[i] *= factor
 
+    else : 
+        if task == "A":
+            class_weights[0] *= 1.7
+            class_weights[1] *= 1.2
+    
+        if task == "B":
+            class_weights[0] *= 1.8
+            class_weights[1] *= 1.4
+            class_weights[2] *= 1.7
+    
+        if task == "C":
+            class_weights[0] *= 1
+            class_weights[1] *= 2
+
     return class_weights
+
+
 
 
 def compute_metrics(eval_pred):
