@@ -5,7 +5,7 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 from transformers import AutoTokenizer
-from hasoc_model import CombinedModel, encode_labels
+from hasoc_model_boosted import CombinedModel, encode_labels
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -97,7 +97,7 @@ def predict_and_eval(task, experiment, model, df, tokenizer, label_col, prefix):
     return report["weighted avg"]["f1-score"], report["macro avg"]["f1-score"], report["accuracy"]
 
 def run_all_predictions(experiment):
-    df = pd.read_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_test.tsv", sep="\t")
+    df = pd.read_csv("../hasoc_dataset/test_extra_features.tsv", sep="\t")
     df = encode_labels(df)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     summary = []

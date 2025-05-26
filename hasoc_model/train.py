@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer
-from hasoc_model_base import (
+from hasoc_model import (
     CombinedModelNoFeatures,
     prepare_dataset,
     compute_class_weights,

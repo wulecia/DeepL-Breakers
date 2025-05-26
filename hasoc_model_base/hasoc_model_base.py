@@ -17,7 +17,7 @@ MODEL_NAMES = {
 NUM_LABELS = {"A": 2, "B": 3, "C": 2}
 
 
-df = pd.read_csv("hasoc_dataset/train.tsv", sep="\t")
+df = pd.read_csv("../hasoc_dataset/train.tsv", sep="\t")
 df.columns = ["id", "text", "label_A", "label_B", "label_C"]
 df = df[["text", "label_A", "label_B", "label_C"]] 
 
@@ -32,7 +32,7 @@ df = encode_labels(df)
 
 
 def prepare_dataset(task, split="train"):
-    file_path = f"hasoc_dataset/train.tsv"
+    file_path = f"../hasoc_dataset/train.tsv"
     df = pd.read_csv(file_path, sep="\t")
     df = encode_labels(df)
 

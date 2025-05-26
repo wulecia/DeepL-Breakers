@@ -4,7 +4,7 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 from transformers import AutoTokenizer
-from hasoc_model import CombinedModel, encode_labels, compute_metrics, compute_class_weights, prepare_dataset
+from hasoc_model_boosted import CombinedModel, encode_labels, compute_metrics, compute_class_weights, prepare_dataset
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -110,7 +110,7 @@ def evaluate_predictions(preds, experiment, labels, task, class_weights=None):
 def main():
     experiment = "random_init"
 
-    df = pd.read_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_test.tsv", sep="\t")
+    df = pd.read_csv("../hasoc_dataset/test_extra_features.tsv", sep="\t")
     df = encode_labels(df)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

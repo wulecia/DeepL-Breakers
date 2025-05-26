@@ -61,7 +61,7 @@ def evaluate_predictions(preds, labels, task_name, label_map):
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    df = pd.read_csv("hasoc_dataset/test.tsv", sep="\t", names=["id", "text", "label_A", "label_B", "label_C"])
+    df = pd.read_csv("../hasoc_dataset/test.tsv", sep="\t", names=["id", "text", "label_A", "label_B", "label_C"])
     df = df.dropna(subset=["text", "label_A"])
 
     df["label_A_enc"] = df["label_A"].map({"NOT": 0, "HOF": 1})

@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer
-from hasoc_model import *
+from hasoc_model_boosted import *
 
 ALL_WEIGHTS = {
     "A": [
