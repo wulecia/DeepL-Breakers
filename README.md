@@ -9,7 +9,7 @@ This project explores hate speech and offensive language detection using transfo
 
 ### Hate Speech Classification Models:
 3. Train RoBERTa & HateBERT models on HASOC Sub-tasks A, B, and C: Using the HASOC 2019 dataset, we train classification models (RoBERTa and HateBERT) to solve the three HASOC subtasks (A, B, and C).
-4. Fine-tune with 13 additional features to boost performance: Then we fine-tune these models, by integrating the inferred features from the first stage into the classification models to improve performance.
+4. Fine-tune with 13 additional features to boost performance: Then we fine-tune these models, by integrating the 13 inferred features from the first stage into the classification models to improve performance on the 3 tasks.
 
 ## Subtasks
 The HASOC 2019 dataset contains tweets in English, German, and Hindi. We focus on English tweets across three subtasks:
@@ -37,52 +37,38 @@ TIN – Targeted Insult: Direct insult/threat against individuals, groups, or ot
 UNT – Untargeted: Profane or aggressive language without a specific target.
 
 
-## Implementation
-
-### Preprocessing
-Tokenization
-
-### Deeplearning
-BERTMultiTaskModel, RoBERTa, HateBERT
+## Implementation 
 
 ## Running
-- Move this to the folder "paola":  
+- Move this to the folder "berkeley_model":  
 python3 -m gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW  
- 
-- Move these to the folder "coline":  
+- Move these to the folder "hasoc_model_base":  
 python3 -m gdown https://drive.google.com/uc?id=1PCzrY1vg6NcG_T9ogi46swyufyEOtOg9  
 python3 -m gdown https://drive.google.com/uc?id=1qj0GclRw8y3Y6jSOnyBS8rVd23K-Ebqr  
 python3 -m gdown https://drive.google.com/uc?id=1eCx2Lmbhh_eVAbyy-lpO8QSl3jSI6Fci  
-- Install requirements using `pip3 install -r requirements.txt`
-- `paola/...py` to train the BertMultiTasks model on Berkeley Dataset (1).
-- `coline/coline_features.py` to infer the 13 features to Hasoc Dataset (2).
-- `clara/...py` to train the RoBERTa and HateBERT models on Hasoc Dataset (3).
-- `boosted_model/train.py` to train the fine-tuned model on Hasoc Dataset (4).
-- `boosted_model/predict.py` to evaluate the fine-tuned model on Hasoc Dataset (4).
-
-- Move these to the folder "hasoc_model/results/models":  
-python3 -m gdown https://drive.google.com/uc?id=17o32Sa6Mb7Soz21KEziMcPgfybHAtLmt  
-python3 -m gdown https://drive.google.com/uc?id=10tkbyTi3DXT8bDe5A2EJuJotJVxa-Qgn  
-python3 -m gdown https://drive.google.com/uc?id=1Q2oC3KpcyuTujbn15ibl41k6OvKzyB6S  
-unzip best_no_features_A_roberta-base_full.pt.zip  
-unzip best_no_features_B_hateBERT_full.pt.zip  
-unzip best_no_features_C_hateBERT_full.pt.zip
-
-- Move these to the folder "coline":  
+- Move these to the folder "hasoc_model_base":  
 python3 -m gdown https://drive.google.com/uc?id=1Uxwq9xVr1UHNXrXvd1_Rewz1Fe-QHevs  
 python3 -m gdown https://drive.google.com/uc?id=1INMtTKjdX6LPENm-ktBuO5NPGEuKJyph  
-python3 -m gdown https://drive.google.com/uc?id=1G6ZK1NXU_0FwuRYvZFy_tyj5vqdjMjmP
+python3 -m gdown https://drive.google.com/uc?id=1G6ZK1NXU_0FwuRYvZFy_tyj5vqdjMjmP  
+- Install requirements using `pip3 install -r requirements.txt`  
+- `berkeley_model/...py` to train BertMultiTasks model on Berkeley Dataset (1).  
+- `new_features/add_extra_features.py` to infer the 13 features to Hasoc Dataset (2).  
+- `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate baseline RoBERTa and HateBERT models on Hasoc Dataset (3).  
+
+Depending on the experiment, you have to run different files for training the fine-tuned models on Hasoc Dataset (4):  
+- `hasoc_model_boosted/train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with V2.1 model.  
+- `hasoc_model_boosted/grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have several specific class weights to try V2.1 model.  
+- `hasoc_model_boosted/load_train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with V2.2 or V2.3 model.
+- `hasoc_model_boosted/load_grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have several specific class weights to try V2.2 or V2.3 model.  
+For the last two, change `freeze` and `experiment` arguments to choose between V2.2 or V2.3 models.  
+
+Optional:  
+- `new_features/features_descr_analysis.py` to realize a descriptive analysis of the 13 features.  
+- `hasoc_model_boosted/show_cm.py` to show the Top 1 confusion matrices of the results.  
+- `hasoc_model_boosted/print_results.py` to print results.
 
 ## Ideas of improvement
 
-### Preprocessing
-Stopwords Removal, Lemmatizaion, Stemming
-
-### Vectorization
-TFIDF, Count, Word2Vec, GloVe, fastText
-
-### Classification
-KNN, Naïve Bayes, SVM, Decision Trees, Random Forest, Logistic Regression, MLP, Adaboost, Bagging
 
 ## References
 

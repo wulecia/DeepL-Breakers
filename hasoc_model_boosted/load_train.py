@@ -24,7 +24,7 @@ tokenizer_A = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
 dataset_A, labels_A = prepare_dataset(task)
 model_A = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
-state_dictA = torch.load("../coline/best_model_A_roberta-base.pth", map_location=device, weights_only=True)
+state_dictA = torch.load("../hasoc_model_base/best_model_A_roberta-base.pth", map_location=device, weights_only=True)
 new_state_dictA = OrderedDict()
 for k, v in state_dictA.items():
     new_key = k
@@ -49,7 +49,7 @@ tokenizer_B = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
 dataset_B, labels_B = prepare_dataset(task)
 model_B = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
-state_dictB = torch.load("../coline/best_model_B_hateBERT.pth", map_location=device, weights_only=True)
+state_dictB = torch.load("../hasoc_model_base/best_model_B_hateBERT.pth", map_location=device, weights_only=True)
 new_state_dictB = OrderedDict()
 for k, v in state_dictB.items():
     new_key = k
@@ -73,7 +73,7 @@ tokenizer_C = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
 dataset_C, labels_C = prepare_dataset(task)
 model_C = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
-state_dictC = torch.load("../coline/best_model_C_hateBERT.pth", map_location=device, weights_only=True)
+state_dictC = torch.load("../hasoc_model_base/best_model_C_hateBERT.pth", map_location=device, weights_only=True)
 new_state_dictC = OrderedDict()
 for k, v in state_dictC.items():
     new_key = k

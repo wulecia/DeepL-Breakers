@@ -53,9 +53,9 @@ def train_all(freeze, experiment):
             model = CombinedModelNoFeatures(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
             try:
-                state_dict = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device, weights_only=True)
+                state_dict = torch.load(f"../hasoc_model_base/{LOAD_DICT_PATH[task]}", map_location=device, weights_only=True)
             except TypeError:
-                model_wrapper = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device)
+                model_wrapper = torch.load(f"../hasoc_model_base/{LOAD_DICT_PATH[task]}", map_location=device)
                 state_dict = model_wrapper.state_dict()
                 
             new_state_dict = OrderedDict()
