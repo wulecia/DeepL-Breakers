@@ -9,11 +9,6 @@ from transformers import AutoModel, AutoTokenizer
 import torch.nn as nn
 import pandas as pd
 import numpy as np
-#get_ipython().run_line_magic('load_ext', 'autoreload')
-#get_ipython().run_line_magic('autoreload', '2')
-
-#torch.cuda.empty_cache()
-#torch.cuda.ipc_collect()
 import os
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
