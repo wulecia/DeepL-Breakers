@@ -5,7 +5,7 @@ from model_utils import get_model
 
 def main():
     # === Settings ===
-    model_path = "results/best_model_2025-05-21_14-23-53.pth"  # change to your actual path
+    model_path = "best_Berkeley_model.pth"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
