@@ -24,14 +24,19 @@ tokenizer_A = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
 dataset_A, labels_A = prepare_dataset(task)
 model_A = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
-state_dictA = torch.load("../hasoc_model_base/best_model_A_roberta-base.pth", map_location=device, weights_only=True)
+try:
+    state_dictA = torch.load(f"../hasoc_model_base/best_no_features_A_roberta-base.pth", map_location=device, weights_only=True)
+except TypeError:
+    model_wrapperA = torch.load(f"../hasoc_model_base/best_no_features_A_roberta-base.pth", map_location=device)
+    state_dictA = model_wrapperA.state_dict()
+
 new_state_dictA = OrderedDict()
 for k, v in state_dictA.items():
     new_key = k
     if k.startswith('roberta.'):
         new_key = k.replace('roberta.', 'text_model.')
     new_state_dictA[new_key] = v
-model_A.load_state_dict(new_state_dictA, strict=False)  # strict=False to ignore unexpected keys (e.g. classifier, etc.)
+model_A.load_state_dict(new_state_dictA, strict=False)  
 
 
 class_weights_A = compute_class_weights(labels_A, NUM_LABELS[task], task=task)
@@ -49,7 +54,12 @@ tokenizer_B = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
 dataset_B, labels_B = prepare_dataset(task)
 model_B = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
-state_dictB = torch.load("../hasoc_model_base/best_model_B_hateBERT.pth", map_location=device, weights_only=True)
+try:
+    state_dictB = torch.load(f"../hasoc_model_base/best_no_features_B_hateBERT_full.pth", map_location=device, weights_only=True)
+except TypeError:
+    model_wrapperB = torch.load(f"../hasoc_model_base/best_no_features_B_hateBERT_full.pth", map_location=device)
+    state_dictB = model_wrapperB.state_dict()
+
 new_state_dictB = OrderedDict()
 for k, v in state_dictB.items():
     new_key = k
@@ -73,7 +83,12 @@ tokenizer_C = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
 dataset_C, labels_C = prepare_dataset(task)
 model_C = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
-state_dictC = torch.load("../hasoc_model_base/best_model_C_hateBERT.pth", map_location=device, weights_only=True)
+try:
+    state_dictC = torch.load(f"../hasoc_model_base/best_no_features_C_hateBERT_full.pth", map_location=device, weights_only=True)
+except TypeError:
+    model_wrapperC = torch.load(f"../hasoc_model_base/best_no_features_C_hateBERT_full.pth", map_location=device)
+    state_dictC = model_wrapperC.state_dict()
+
 new_state_dictC = OrderedDict()
 for k, v in state_dictC.items():
     new_key = k
