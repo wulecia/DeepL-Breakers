@@ -8,7 +8,6 @@ from hasoc_model_boosted import CombinedModel, encode_labels, compute_metrics, c
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
-#---------------------
 import os
 from datetime import datetime
 from sklearn.metrics import classification_report, confusion_matrix
@@ -46,14 +45,12 @@ def load_model(task, experiment, device):
     model_path = f"./results/{experiment}/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
     model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13)
 
-    # Load saved weights
     state_dict = torch.load(model_path + ".pth", map_location=device)
     if any(k.startswith("module.") for k in state_dict.keys()):
         state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
     model.load_state_dict(state_dict)
 
-    # Recompute class weights
-    _, labels = prepare_dataset(task)  # Only need labels
+    _, labels = prepare_dataset(task) 
     class_weights = compute_class_weights(labels, NUM_LABELS[task], task=task)
     model.class_weights = class_weights
 
@@ -139,8 +136,6 @@ def main():
     preds_C = predict_task("C", model_C, df_C, tokenizer_C, device)
     evaluate_predictions(preds_C, experiment, df_C["label_C_enc"].values, "C", model_C.class_weights)
 
-
-    # Save all metrics into one file after all tasks are processed
     os.makedirs(f"results", exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = f"results/{experiment}/run_{timestamp}.csv"
@@ -157,7 +152,7 @@ def main():
                 row["Class Weights"],
                 row["Confusion Matrix"]
             ])
-    print(f"\n✅ Metrics saved to {output_file}")
+    print(f"\n Metrics saved to {output_file}")
 
 
 
