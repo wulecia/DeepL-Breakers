@@ -106,9 +106,9 @@ python3 -m gdown https://drive.google.com/uc?id=1Wem7CyJh8T-gb-ct8fLIejsPV_5frJl
 python3 -m gdown https://drive.google.com/uc?id=1_65mHOetpg9Z1S3X5zoAtplSZyyWlly3  
 
 - Install requirements using `pip3 install -r requirements.txt`  
-- `berkeley_model/...py` to train BertMultiTasks model on Berkeley Dataset (1).  
+- `berkeley_model/...py` to train [BertMultiTasks model](#feature-extraction-model) on Berkeley Dataset (1).  
 - `new_features/add_extra_features.py` to infer the 13 features to Hasoc Dataset (2).  
-- `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate baseline RoBERTa and HateBERT models on Hasoc Dataset (3).  
+- `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate [baseline RoBERTa and HateBERT models](#hate-speech-classification-models) on Hasoc Dataset (3).  
 
 Depending on the experiment, you have to run different files for training the fine-tuned models on Hasoc Dataset (4):  
 - `hasoc_model_boosted/train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with [V2.1 model](#hate-speech-classification-models).  
