@@ -36,20 +36,14 @@ TIN – Targeted Insult: Direct insult/threat against individuals, groups, or ot
 
 UNT – Untargeted: Profane or aggressive language without a specific target.
 
-
-## Implementation 
-
 ## Running
 - Move this to the folder "berkeley_model":  
 python3 -m gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW  
 - Move these to the folder "hasoc_model_base":  
-python3 -m gdown https://drive.google.com/uc?id=1PCzrY1vg6NcG_T9ogi46swyufyEOtOg9  
-python3 -m gdown https://drive.google.com/uc?id=1qj0GclRw8y3Y6jSOnyBS8rVd23K-Ebqr  
-python3 -m gdown https://drive.google.com/uc?id=1eCx2Lmbhh_eVAbyy-lpO8QSl3jSI6Fci  
-- Move these to the folder "hasoc_model_base":  
-python3 -m gdown https://drive.google.com/uc?id=1Uxwq9xVr1UHNXrXvd1_Rewz1Fe-QHevs  
-python3 -m gdown https://drive.google.com/uc?id=1INMtTKjdX6LPENm-ktBuO5NPGEuKJyph  
-python3 -m gdown https://drive.google.com/uc?id=1G6ZK1NXU_0FwuRYvZFy_tyj5vqdjMjmP  
+python3 -m gdown https://drive.google.com/uc?id=1o1b4vRKceIVEPSfXUrcrlSFvD6nQYc-9
+python3 -m gdown https://drive.google.com/uc?id=1Wem7CyJh8T-gb-ct8fLIejsPV_5frJls
+python3 -m gdown https://drive.google.com/uc?id=1_65mHOetpg9Z1S3X5zoAtplSZyyWlly3
+
 - Install requirements using `pip3 install -r requirements.txt`  
 - `berkeley_model/...py` to train BertMultiTasks model on Berkeley Dataset (1).  
 - `new_features/add_extra_features.py` to infer the 13 features to Hasoc Dataset (2).  
@@ -57,18 +51,23 @@ python3 -m gdown https://drive.google.com/uc?id=1G6ZK1NXU_0FwuRYvZFy_tyj5vqdjMjm
 
 Depending on the experiment, you have to run different files for training the fine-tuned models on Hasoc Dataset (4):  
 - `hasoc_model_boosted/train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with V2.1 model.  
-- `hasoc_model_boosted/grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have several specific class weights to try V2.1 model.  
+- `hasoc_model_boosted/grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have a grid of specific class weights to try V2.1 model.  
 - `hasoc_model_boosted/load_train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with V2.2 or V2.3 model.
-- `hasoc_model_boosted/load_grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have several specific class weights to try V2.2 or V2.3 model.  
+- `hasoc_model_boosted/load_grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have a grid of specific class weights to try V2.2 or V2.3 model.  
 For the last two, change `freeze` and `experiment` arguments to choose between V2.2 or V2.3 models.  
 
 Optional:  
-- `new_features/features_descr_analysis.py` to realize a descriptive analysis of the 13 features.  
+- `new_features/features_descr_analysis.py` to perform a descriptive analysis of the 13 features.  
 - `hasoc_model_boosted/show_cm.py` to show the Top 1 confusion matrices of the results.  
 - `hasoc_model_boosted/print_results.py` to print results.
 
 ## Ideas of improvement
 
+Train on complementary datasets  
+Extend to multilingual models  
+Perform feature ablation studies  
+Test robustness across tweet platforms  
+Preprocess tweets (stemming, lemmatization...)
 
 ## References
 
