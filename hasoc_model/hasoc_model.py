@@ -3,18 +3,12 @@ import torch
 import torch.nn as nn
 import numpy as np
 import pandas as pd
-from transformers import (
-    AutoTokenizer,
-    AutoModelForSequenceClassification,
-    TrainingArguments,
-    Trainer,
-    EarlyStoppingCallback
-)
+from transformers import AutoTokenizer, AutoModel, TrainingArguments, Trainer, EarlyStoppingCallback
 from datasets import Dataset
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score 
 from sklearn.utils.class_weight import compute_class_weight
 
-# === 1. Constantes ===
+
 MODEL_NAMES = {
     "A": "roberta-base",
     "B": "GroNLP/hateBERT",
@@ -23,7 +17,6 @@ MODEL_NAMES = {
 NUM_LABELS = {"A": 2, "B": 3, "C": 2}
 
 
-# === 2. Charger les données HASOC ===
 df = pd.read_csv("hasoc_dataset/train.tsv", sep="\t")
 df.columns = ["id", "text", "label_A", "label_B", "label_C"]
 df = df[["text", "label_A", "label_B", "label_C"]] 
@@ -32,56 +25,53 @@ def encode_labels(df):
     df = df.copy()
     df["label_A_enc"] = df["label_A"].map({"NOT": 0, "HOF": 1})
     df["label_B_enc"] = df["label_B"].map({"HATE": 0, "OFFN": 1, "PRFN": 2})
-    df["label_C_enc"] = df["label_C"].map({"UNT": 0, "TIN": 1}) 
+    df["label_C_enc"] = df["label_C"].map({"UNT": 0, "TIN": 1})
     return df.dropna(subset=["label_A_enc"])
 
 df = encode_labels(df)
 
 
+def prepare_dataset(task, split="train"):
+    file_path = f"hasoc_dataset/train.tsv"
+    df = pd.read_csv(file_path, sep="\t")
+    df = encode_labels(df)
 
-# === 3. Préparer les datasets ===
-def prepare_dataset(df, task):
-    if task == "A":
-        df_task = df.dropna(subset=["label_A_enc"])
-        labels = df_task["label_A_enc"].tolist()
+    if task in ["B", "C"]:
+        df = df[df["label_A"] == "HOF"]
 
-    elif task == "B":
-        df_task = df[df["label_A"] == "HOF"].dropna(subset=["label_B_enc"])
-        labels = df_task["label_B_enc"].tolist()
+    label_col = f"label_{task}_enc"
+    df_task = df[["text", label_col]].dropna()
 
-    elif task == "C":
-        df_task = df[(df["label_A"] == "HOF") & (df["label_C"].isin(["UNT", "TIN"]))].dropna(subset=["label_C_enc"])
-        labels = df_task["label_C_enc"].tolist()
-
-    if df_task.empty:
-        raise ValueError(f"⚠️ Aucune donnée trouvée pour la tâche {task}. Vérifie les filtres.")
-
-    texts = df_task["text"].tolist()
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
-    encodings = tokenizer(texts, truncation=True, padding=True)
+    encodings = tokenizer(df_task["text"].tolist(), truncation=True, padding=True, max_length=128)
 
     dataset = Dataset.from_dict({
         "input_ids": encodings["input_ids"],
         "attention_mask": encodings["attention_mask"],
-        "labels": torch.tensor(labels, dtype=torch.long).tolist()
+        "labels": df_task[label_col].astype(int).tolist()
     })
 
-    return dataset.train_test_split(test_size=0.2, seed=42), labels
+    return dataset.train_test_split(test_size=0.2, seed=42), df_task[label_col].tolist()
 
 
-# === 4. Pondération des classes ===
 def compute_class_weights(labels, num_labels, task=None):
     class_weights = compute_class_weight(class_weight='balanced', classes=np.arange(num_labels), y=labels)
+    class_weights = torch.tensor(class_weights, dtype=torch.float)
 
-    if task == "C":
-        class_weights[1] *= 1.0
+    if task == "A":
         class_weights[0] *= 2.0
+        class_weights[1] *= 1.0
+    if task == "B":
+        class_weights[0] *= 1.8
+        class_weights[1] *= 1.4
+        class_weights[2] *= 1.8
+    if task == "C":
+        class_weights[0] *= 1.0
+        class_weights[1] *= 2.5
 
-    return torch.tensor(class_weights, dtype=torch.float)
+    return class_weights
 
 
-
-# === 5. Métriques ===
 def compute_metrics(eval_pred):
     predictions, labels = eval_pred
     preds = np.argmax(predictions, axis=1)
@@ -91,9 +81,33 @@ def compute_metrics(eval_pred):
         "accuracy": report["accuracy"]
     }
 
+def log_metrics_to_csv(log_history, task):
+    import csv
+    from collections import defaultdict
+    os.makedirs("visu", exist_ok=True)
+    path = f"visu/metrics_{task}.csv"
+    epochs = defaultdict(dict)
+    for entry in log_history:
+        if "epoch" in entry:
+            epoch = round(entry["epoch"], 2)
+            for key in ["loss", "eval_loss", "eval_f1", "eval_accuracy"]:
+                if key in entry:
+                    epochs[epoch][key] = entry[key]
 
-    
-# === 6. Trainer personnalisé pour tâche B ===
+    with open(path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["epoch", "train_loss", "eval_loss", "eval_f1", "eval_accuracy"])
+        writer.writeheader()
+        for epoch in sorted(epochs.keys()):
+            row = {
+                "epoch": epoch,
+                "train_loss": epochs[epoch].get("loss", 0),
+                "eval_loss": epochs[epoch].get("eval_loss", 0),
+                "eval_f1": epochs[epoch].get("eval_f1", 0),
+                "eval_accuracy": epochs[epoch].get("eval_accuracy", 0)
+            }
+            writer.writerow(row)
+
+
 class WeightedFocalLossTrainer(Trainer):
     def __init__(self, class_weights=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -103,40 +117,41 @@ class WeightedFocalLossTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
         labels = inputs.pop("labels").long()
         outputs = model(**inputs)
-        logits = outputs.logits
-
+        logits = outputs["logits"]
         ce_loss = torch.nn.functional.cross_entropy(logits, labels, weight=self.class_weights, reduction='none')
         pt = torch.exp(-ce_loss)
         focal_loss = ((1 - pt) ** self.gamma * ce_loss).mean()
-
         return (focal_loss, outputs) if return_outputs else focal_loss
 
-
-
-# === 7. Classe ModelHASOC ===
-class ModelHASOC(nn.Module):
-    def __init__(self, task, model_name=None, num_labels=None, class_weights=None):
-        super(ModelHASOC, self).__init__()
-        self.task = task
-        self.model_name = model_name or MODEL_NAMES[task]
-        self.num_labels = num_labels or NUM_LABELS[task]
-        self.class_weights = class_weights
-
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            self.model_name,
-            num_labels=self.num_labels
+class CombinedModelNoFeatures(nn.Module):
+    def __init__(self, model_name, num_labels):
+        super().__init__()
+        self.model_name = model_name
+        self.text_model = AutoModel.from_pretrained(model_name)
+        self.dropout = nn.Dropout(0.1)
+        self.classifier = nn.Sequential(
+            nn.Linear(self.text_model.config.hidden_size, 128),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(128, num_labels)
         )
+        self.class_weights = None
 
-    def forward(self, **inputs):
-        return self.model(**inputs)
+    def forward(self, input_ids, attention_mask, labels=None):
+        text_output = self.text_model(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
+        logits = self.classifier(text_output)
+        loss = None
+        if labels is not None:
+            loss_fn = nn.CrossEntropyLoss(weight=self.class_weights.to(logits.device))
+            loss = loss_fn(logits, labels)
+        return {"loss": loss, "logits": logits}
 
+def train_model(task, model_wrapper, dataset, tokenizer, resume=False):
+    model = model_wrapper.module if isinstance(model_wrapper, nn.DataParallel) else model_wrapper
+    output_dir = f"./results/models/no_features_{task}_{model.model_name.split('/')[-1]}"
+    logging_dir = f"./results/models/no_features_logs_{task}_{model.model_name.split('/')[-1]}"
 
-
-# === 8. Training ===
-def train_model(task, model_wrapper, dataset, labels, tokenizer, resume=True):
-    output_dir = f"./results_{task}_{model_wrapper.model_name.split('/')[-1]}"
-    logging_dir = f"./logs_{task}_{model_wrapper.model_name.split('/')[-1]}"
-
+    os.makedirs(output_dir, exist_ok=True)
     checkpoint_path = None
     if resume and os.path.isdir(output_dir):
         checkpoints = [os.path.join(output_dir, d) for d in os.listdir(output_dir) if d.startswith("checkpoint")]
@@ -151,13 +166,13 @@ def train_model(task, model_wrapper, dataset, labels, tokenizer, resume=True):
     training_args = TrainingArguments(
         output_dir=output_dir,
         logging_dir=logging_dir,
-        num_train_epochs=4,
-        per_device_train_batch_size=4,
+        num_train_epochs=12,
+        per_device_train_batch_size=16,
         per_device_eval_batch_size=16,
         save_strategy="steps" if task == "B" else "epoch",
-        save_steps=500 if task == "B" else None,
+        save_steps=200 if task == "B" else None,
         eval_strategy="steps" if task == "B" else "epoch",
-        eval_steps=500 if task == "B" else None,
+        eval_steps=200 if task == "B" else None,
         logging_steps=100,
         learning_rate=2e-5,
         weight_decay=0.01,
@@ -169,49 +184,25 @@ def train_model(task, model_wrapper, dataset, labels, tokenizer, resume=True):
         logging_first_step=True,
         disable_tqdm=False,
         greater_is_better=True,
-        seed=42
+        seed=42,
+        do_train=True,
+        remove_unused_columns=False
     )
 
-    if task in ["B", "A"]:
-        trainer = WeightedFocalLossTrainer(
-            class_weights=model_wrapper.class_weights,
-            model=model_wrapper.model,
-            args=training_args,
-            train_dataset=dataset["train"],
-            eval_dataset=dataset["test"],
-            compute_metrics=compute_metrics,
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=2)]
-        )
-    else:
-        trainer = Trainer(
-            model=model_wrapper.model,
-            args=training_args,
-            train_dataset=dataset["train"],
-            eval_dataset=dataset["test"],
-            tokenizer=tokenizer,
-            compute_metrics=compute_metrics
-        )
+    model_wrapper.class_weights = model.class_weights 
+    trainer = WeightedFocalLossTrainer(
+        model=model,
+        args=training_args,
+        train_dataset=dataset["train"],
+        eval_dataset=dataset["test"],
+        compute_metrics=compute_metrics,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)]
+    )
 
     trainer.train(resume_from_checkpoint=checkpoint_path if checkpoint_path else None)
 
-    trainer.save_model(f"./coco/best_model_{task}_{model_wrapper.model_name.split('/')[-1]}")
     torch.save(
-        model_wrapper.model.state_dict(),
-        f"./coco/best_model_{task}_{model_wrapper.model_name.split('/')[-1]}.pth"
+        model.state_dict(),
+        f"./results/models/best_no_features_{task}_{model.model_name.split('/')[-1]}_full.pth"
     )
-    print(f"✅ Task {task} training complete.")
-    
-
-# === 9. Main Loop ===
-if __name__ == "__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    for task in ["A", "B", "C"]:
-        print(f"\n🚀 Training Task {task}")
-        dataset, labels = prepare_dataset(df, task)
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAMES[task], use_fast=True)
-
-        class_weights = compute_class_weights(labels, NUM_LABELS[task], task=task) if task in ["A", "B", "C"] else None
-        model_wrapper = ModelHASOC(task=task, class_weights=class_weights).to(device)
-
-        train_model(task, model_wrapper, dataset, labels, tokenizer, resume=True)
+    print(f"Task {task} training complete.")
