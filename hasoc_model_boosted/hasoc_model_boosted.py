@@ -1,4 +1,4 @@
-# === hasoc_model.py ===
+# === hasoc_model_boosted.py ===
 import os
 import torch
 import torch.nn as nn
@@ -86,8 +86,6 @@ def compute_class_weights(labels, num_labels, task=None, weight_factors=None):
             class_weights[1] *= 2
 
     return class_weights
-
-
 
 
 def compute_metrics(eval_pred):
@@ -202,11 +200,11 @@ def train_model(task, experiment, model_wrapper, dataset, tokenizer, resume=Fals
         checkpoints = [os.path.join(output_dir, d) for d in os.listdir(output_dir) if d.startswith("checkpoint")]
         if checkpoints:
             checkpoint_path = sorted(checkpoints, key=lambda x: int(x.split('-')[-1]))[-1]
-            print(f"🔁 Resuming from checkpoint: {checkpoint_path}")
+            print(f"Resuming from checkpoint: {checkpoint_path}")
         else:
-            print("⚠️ No checkpoint found — starting from scratch.")
+            print("No checkpoint found — starting from scratch.")
     else:
-        print("🆕 Starting training from scratch.")
+        print("Starting training from scratch.")
 
     training_args = TrainingArguments(
         output_dir=output_dir,
