@@ -1,9 +1,11 @@
+# === load_grid_train.py ===
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer
 from hasoc_model import *
 from collections import OrderedDict
-'''
+
+
 ALL_WEIGHTS = {
     "A": [
         (1.0, 1.0), (1.5, 1.0), (1.0, 1.5), (1.3, 1.3),
@@ -21,19 +23,6 @@ ALL_WEIGHTS = {
         (2.5, 1.0), (1.0, 2.5), (3.0, 1.0), (1.0, 3.0),
         (4.0, 1.0), (1.0, 4.0)
     ]
-}'''
-
-ALL_WEIGHTS = {
-    "A": [
-        (1.7, 0.9)
-    ],
-    "B": [(1.9, 4.0, 1.9), (2.0, 4.0, 2.0), (1.8, 4.0, 1.8), (1.8, 4.1, 1.8),
-        (1.6, 4.0, 1.6), (2.0, 4.1, 2.0), (2.2, 4.0, 2.2), (2.2, 4.1, 2.2), 
-        (2.0, 4.2, 2.0), (2.0, 3.9, 2.0)
-    ],
-    "C": [
-        (1.0, 2.0)
-    ]
 }
 
 LOAD_DICT_KEY = {
@@ -43,16 +32,10 @@ LOAD_DICT_KEY = {
 }
 
 LOAD_DICT_PATH = {
-    "A": "best_model_A_roberta-base.pth",
-    "B": "best_model_B_hateBERT.pth",
-    "C": "best_model_C_hateBERT.pth"
-}
-'''
-LOAD_DICT_PATH = {
     "A": "best_no_features_A_roberta-base_full.pt",
-    "B": "best_no_features_B_hateBERT_full.pt",
+    "B": "best_model_B_hateBERT.pth",
     "C": "best_no_features_C_hateBERT_full.pt"
-}'''
+}
 
 def weight_id(task, weights):
     return f"{task}_{'-'.join([str(w).replace('.', '') for w in weights])}"
@@ -69,17 +52,19 @@ def train_all(freeze, experiment):
             print(f"\n=== TRAINING {task} with weights {weights} ===")
             model = CombinedModelNoFeatures(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
-            #model_wrapper = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device)
-            #state_dict = model_wrapper.state_dict()
-            state_dict = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device, weights_only = True)
-            
+            try:
+                state_dict = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device, weights_only=True)
+            except TypeError:
+                model_wrapper = torch.load(f"../coline/{LOAD_DICT_PATH[task]}", map_location=device)
+                state_dict = model_wrapper.state_dict()
+                
             new_state_dict = OrderedDict()
             for k, v in state_dict.items():
                 new_key = k
                 if k.startswith(LOAD_DICT_KEY[task]):
                     new_key = k.replace(LOAD_DICT_KEY[task], 'text_model.')
                 new_state_dict[new_key] = v
-            model.load_state_dict(new_state_dict, strict=False)  # strict=False to ignore unexpected keys (e.g. classifier, etc.)
+            model.load_state_dict(new_state_dict, strict=False)
 
             
             class_weights = compute_class_weights(labels, NUM_LABELS[task], task=task, weight_factors=weights)
@@ -106,5 +91,5 @@ def train_all(freeze, experiment):
 
 if __name__ == "__main__":
     freeze = False
-    experiment = "new2_load_grid"
+    experiment = "load_grid"
     train_all(freeze, experiment)
