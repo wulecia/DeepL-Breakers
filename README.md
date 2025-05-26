@@ -44,8 +44,8 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 │   ├── data
 │   │   └── measuring-hate-speech.parquet  # Parquet file with Berkeley data
 │   ├── results                     # Plots and test results
-│   │   ├── loss_plot_*.png             # Loss plots over training
-│   │   └── test_results_*.csv         # Test set evaluation results
+│   │   ├── loss_plot_*.png         # Loss plots over training
+│   │   └── test_results_*.csv      # Test set evaluation results
 │   ├── best_Berkeley_model.pth     # Best model weights
 │   ├── functions2.py               # Supporting functions
 │   ├── model_utils.py              # Utility functions for the model
@@ -70,7 +70,7 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 │
 ├── hasoc_model_boosted             # Boosted model for HASOC
 │   ├── results
-│   │   ├── grid_metrics/               # Grid search results
+│   │   ├── grid_metrics/           # Grid search results
 │   │   │   ├── run_*.csv
 │   ├── grid_predict.py             # Grid search prediction
 │   ├── grid_train.py               # Grid search training
@@ -91,7 +91,7 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 ├── LICENSE_hasoc                   # License for HASOC dataset
 ├── README.md                       # This file
 └── requirements.txt                # Required Python packages
-
+```
 
 
 ## Implementation 
