@@ -1,100 +1,115 @@
+import os
 import torch
 import pandas as pd
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from sklearn.metrics import accuracy_score, f1_score, classification_report
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from transformers import AutoTokenizer
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score
 
-# === Device (CPU ou GPU) ===
-device = torch.device("cpu")  # ou "cuda" si tu veux tester sur GPU
-
-# === Chargement des modèles ===
-model_A = AutoModelForSequenceClassification.from_pretrained("./coco/best_model_A_roberta-base").to(device)
-tokenizer_A = AutoTokenizer.from_pretrained("roberta-base")
-
-model_B = AutoModelForSequenceClassification.from_pretrained("./coco/best_model_B_hateBERT").to(device)
-tokenizer_B = AutoTokenizer.from_pretrained("GroNLP/hateBERT")
-
-model_C = AutoModelForSequenceClassification.from_pretrained("./coco/best_model_C_hateBERT").to(device)
-tokenizer_C = AutoTokenizer.from_pretrained("GroNLP/hateBERT")
-
+MODEL_NAMES = {
+    "A": "roberta-base",
+    "B": "GroNLP/hateBERT",
+    "C": "GroNLP/hateBERT"
+}
+LABEL_MAPS = {
+    "A": {0: "NOT", 1: "HOF"},
+    "B": {0: "HATE", 1: "OFFN", 2: "PRFN"},
+    "C": {0: "UNT", 1: "TIN"}
+}
+NUM_LABELS = {"A": 2, "B": 3, "C": 2}
 
 
-# === Chargement du fichier test HASOC ===
-df = pd.read_csv("hasoc_dataset/test.tsv", sep="\t")
-df.columns = ["id", "text", "label_A_gold", "label_B_gold", "label_C_gold"]
-tweets = df["text"].tolist()
+def load_model(task, device):
+    model_path = f"./results/models/best_no_features_{task}_{MODEL_NAMES[task].split('/')[-1]}_full.pt"
+    model = torch.load(model_path, map_location=device)
+    return model.eval().to(device)
 
-# === Fonction de prédiction ===
-def predict(texts, model, tokenizer, max_length=128):
-    model.eval()
-    inputs = tokenizer(texts, return_tensors="pt", truncation=True, padding=True, max_length=max_length)
-    inputs = {k: v.to(model.device) for k, v in inputs.items()}
+def tokenize_batch(df, tokenizer):
+    return tokenizer(df["text"].tolist(), truncation=True, padding=True, max_length=128, return_tensors="pt")
+
+
+def predict_batch(task, model, df, tokenizer, device):
+    inputs = tokenize_batch(df, tokenizer)
+    inputs = {k: v.to(device) for k, v in inputs.items() if k in ['input_ids', 'attention_mask']}
     with torch.no_grad():
-        logits = model(**inputs).logits
-    return torch.argmax(logits, dim=1).cpu().numpy()
-
-# === Étape 1 : prédiction Task A ===
-y_pred_A = predict(tweets, model_A, tokenizer_A)
-off_mask = (y_pred_A == 1)
-
-# === Étape 2 : Task B (sur tweets HOF) ===
-tweets_B = [t for i, t in enumerate(tweets) if off_mask[i]]
-y_pred_B_partial = predict(tweets_B, model_B, tokenizer_B)
-
-# === Étape 3 : Task C (sur tweets B == HATE) ===
-tin_mask = (y_pred_B_partial == 0)  # HATE = 0
-tweets_C = [t for i, t in enumerate(tweets_B) if tin_mask[i]]
-y_pred_C_partial = predict(tweets_C, model_C, tokenizer_C)
+        outputs = model(**inputs)
+        logits = outputs["logits"]
+        preds = torch.argmax(logits, dim=1).cpu().numpy()
+    return preds
 
 
-# === Reconstruction des prédictions texte ===
-pred_A = ["HOF" if x == 1 else "NOT" for x in y_pred_A]
-pred_B, pred_C = ["NULL"] * len(tweets), ["NULL"] * len(tweets)
+def evaluate_predictions(preds, labels, task_name, label_map):
+    print(f"\n=== Evaluation for task {task_name} ===")
+    print(classification_report(labels, preds, target_names=label_map.values(), digits=4, zero_division=0))
+    print(f"Accuracy: {accuracy_score(labels, preds):.4f}")
+    print(f"F1-score (weighted): {f1_score(labels, preds, average='weighted'):.4f}")
+    print(f"F1-score (macro): {f1_score(labels, preds, average='macro'):.4f}")  # ✅ this line
 
-b_idx = 0
-for i, is_off in enumerate(off_mask):
-    if is_off:
-        pred_B[i] = ["HATE", "OFFN", "PRFN"][y_pred_B_partial[b_idx]]
-        b_idx += 1
-
-c_idx = 0
-for i, is_off in enumerate(off_mask):
-    if is_off and pred_B[i] == "HATE":
-        pred_C[i] =["UNT", "TIN"][y_pred_C_partial[c_idx]]
-        c_idx += 1
-
-# === Ajout au DataFrame ===
-df["pred_A"] = pred_A
-df["pred_B"] = pred_B
-df["pred_C"] = pred_C
-
-# === Convertir les labels gold ===
-gold_A = [1 if label == "HOF" else 0 for label in df["label_A_gold"]]
-gold_B = [ ["HATE", "OFFN", "PRFN"].index(label) if label in ["HATE", "OFFN", "PRFN"] else -1 for label in df["label_B_gold"] ]
-gold_C = [ ["UNT", "TIN"].index(label) if label in ["UNT", "TIN"] else -1 for label in df["label_C_gold"] ]
+    cm = confusion_matrix(labels, preds)
+    print("Confusion Matrix:")
+    print(cm)
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=label_map.values(), yticklabels=label_map.values())
+    plt.title(f"Confusion Matrix for task {task_name}")
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.tight_layout()
+    plt.show()
 
 
+def main():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    df = pd.read_csv("hasoc_dataset/test.tsv", sep="\t", names=["id", "text", "label_A", "label_B", "label_C"])
+    df = df.dropna(subset=["text", "label_A"])
 
-# === Évaluation Task A ===
-print("\n=== Task A ===")
-print("Accuracy:", accuracy_score(gold_A, y_pred_A))
-print("F1-score:", f1_score(gold_A, y_pred_A, average="macro"))
-print(classification_report(gold_A, y_pred_A, target_names=["NOT", "HOF"]))
+    df["label_A_enc"] = df["label_A"].map({"NOT": 0, "HOF": 1})
+    df["label_B_enc"] = df["label_B"].map({"HATE": 0, "OFFN": 1, "PRFN": 2})
+    df["label_C_enc"] = df["label_C"].map({"UNT": 0, "TIN": 1})
 
-# === Évaluation Task B ===
-gold_B_eval = [g for i, g in enumerate(gold_B) if off_mask[i] and g != -1]
-pred_B_eval = [ ["HATE", "OFFN", "PRFN"].index(b) for i, b in enumerate(pred_B) if off_mask[i] and gold_B[i] != -1 ]
+    # === TASK A ===
+    print("\n===== TASK A =====")
+    df_A = df.dropna(subset=["text", "label_A", "label_A_enc"]).copy()
+    tokenizer_A = AutoTokenizer.from_pretrained(MODEL_NAMES["A"], use_fast=True)
+    model_A = load_model("A", device)
+    preds_A = predict_batch("A", model_A, df_A, tokenizer_A, device)
+    assert len(preds_A) == len(df_A), f"preds: {len(preds_A)}, labels: {len(df_A)}"
+    df_A["pred_A"] = preds_A
+    evaluate_predictions(preds_A, df_A["label_A_enc"].astype(int).values, "A", LABEL_MAPS["A"])
+    df.loc[df_A.index, "pred_A"] = df_A["pred_A"]
 
-print("\n=== Task B ===")
-print("Accuracy:", accuracy_score(gold_B_eval, pred_B_eval))
-print("F1-score:", f1_score(gold_B_eval, pred_B_eval, average="macro"))
-print(classification_report(gold_B_eval, pred_B_eval, target_names=["HATE", "OFFN", "PRFN"]))
+    # === TASK B ===
+    print("\n===== TASK B =====")
+    df_B_oracle = df[df["label_A"] == "HOF"].dropna(subset=["label_B_enc"]).copy()
+    df_B_pred = df[df["pred_A"] == 1].dropna(subset=["label_B_enc"]).copy()
+    model_B = load_model("B", device)
+    tokenizer_B = AutoTokenizer.from_pretrained(MODEL_NAMES["B"], use_fast=True)
 
-# === Évaluation Task C ===
-gold_C = [ ["UNT", "TIN"].index(label) if label in ["UNT", "TIN"] else -1 for label in df["label_C_gold"] ]
-gold_C_eval = [g for i, g in enumerate(gold_C) if off_mask[i] and pred_B[i] == "HATE" and g != -1]
-pred_C_eval = [ ["UNT", "TIN"].index(c) for i, c in enumerate(pred_C) if off_mask[i] and pred_B[i] == "HATE" and gold_C[i] != -1 ]
+    if not df_B_oracle.empty:
+        preds_B_oracle = predict_batch("B", model_B, df_B_oracle, tokenizer_B, device)
+        evaluate_predictions(preds_B_oracle, df_B_oracle["label_B_enc"].astype(int).values, "B - Oracle", LABEL_MAPS["B"])
 
-print("\n=== Task C ===")
-print("Accuracy:", accuracy_score(gold_C_eval, pred_C_eval))
-print("F1-score:", f1_score(gold_C_eval, pred_C_eval, average="macro"))
-print(classification_report(gold_C_eval, pred_C_eval, target_names=["UNT", "TIN"]))
+    if not df_B_pred.empty:
+        preds_B_cascade = predict_batch("B", model_B, df_B_pred, tokenizer_B, device)
+        evaluate_predictions(preds_B_cascade, df_B_pred["label_B_enc"].astype(int).values, "B - Cascade", LABEL_MAPS["B"])
+    df.loc[df_B_pred.index, "pred_B"] = preds_B_cascade
+
+    # === TASK C ===
+    print("\n===== TASK C =====")
+    df_C_oracle = df[df["label_A"] == "HOF"].dropna(subset=["label_C_enc"]).copy()
+    df_C_pred = df[(df["pred_A"] == 1) & (df["pred_B"] == 0)].dropna(subset=["label_C_enc"]).copy()
+    model_C = load_model("C", device)
+    tokenizer_C = AutoTokenizer.from_pretrained(MODEL_NAMES["C"], use_fast=True)
+
+    if not df_C_oracle.empty:
+        preds_C_oracle = predict_batch("C", model_C, df_C_oracle, tokenizer_C, device)
+        evaluate_predictions(preds_C_oracle, df_C_oracle["label_C_enc"].astype(int).values, "C - Oracle", LABEL_MAPS["C"])
+
+    if not df_C_pred.empty:
+        preds_C_cascade = predict_batch("C", model_C, df_C_pred, tokenizer_C, device)
+        evaluate_predictions(preds_C_cascade, df_C_pred["label_C_enc"].astype(int).values, "C - Cascade", LABEL_MAPS["C"])
+
+
+if __name__ == "__main__":
+    main()
