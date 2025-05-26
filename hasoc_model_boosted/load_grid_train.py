@@ -50,7 +50,7 @@ def train_all(freeze, experiment):
         for weights in ALL_WEIGHTS[task]:
             model_id = weight_id(task, weights)
             print(f"\n=== TRAINING {task} with weights {weights} ===")
-            model = CombinedModelNoFeatures(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
+            model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13).to(device)
 
             try:
                 state_dict = torch.load(f"../hasoc_model_base/{LOAD_DICT_PATH[task]}", map_location=device, weights_only=True)
