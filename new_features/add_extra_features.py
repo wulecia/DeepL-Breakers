@@ -81,7 +81,7 @@ new_feature_names = ['sentiment', 'respect', 'insult', 'humiliate', 'status',
 
 
 # --- TRAIN ---
-df_clara_train = pd.read_csv("../hasoc_model/hasoc_dataset/train.tsv", sep="\t")
+df_clara_train = pd.read_csv("../hasoc_dataset/train.tsv", sep="\t")
 df_clara_train.columns = ["id", "text", "label_A", "label_B", "label_C"]
 df_clara_train = df_clara_train[["text", "label_A", "label_B", "label_C"]]
 df_clara_train = encode_labels(df_clara_train)
@@ -103,10 +103,10 @@ preds_bin_train = (preds_bin_train.cpu().numpy() > 0.5).astype(int)
 combined_preds_train = np.concatenate([preds_num_train, preds_bin_train], axis=1)
 preds_df_train = pd.DataFrame(combined_preds_train, columns=new_feature_names)
 df_clara_train = pd.concat([df_clara_train.reset_index(drop=True), preds_df_train], axis=1)
-df_clara_train.to_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_train.tsv", sep="\t", index=False)
+df_clara_train.to_csv("../hasoc_dataset/train_extra_features.tsv", sep="\t", index=False)
 
 # --- TEST ---
-df_clara_test = pd.read_csv("../hasoc_model/hasoc_dataset/test.tsv", sep="\t")
+df_clara_test = pd.read_csv("../hasoc_dataset/test.tsv", sep="\t")
 df_clara_test.columns = ["id", "text", "label_A", "label_B", "label_C"]
 df_clara_test = df_clara_test[["text", "label_A", "label_B", "label_C"]]
 df_clara_test = encode_labels(df_clara_test)
@@ -125,7 +125,7 @@ preds_bin_test = (preds_bin_test.cpu().numpy() > 0.5).astype(int)
 combined_preds_test = np.concatenate([preds_num_test, preds_bin_test], axis=1)
 preds_df_test = pd.DataFrame(combined_preds_test, columns=new_feature_names)
 df_clara_test = pd.concat([df_clara_test.reset_index(drop=True), preds_df_test], axis=1)
-df_clara_test.to_csv("../hasoc_model/hasoc_dataset/hasoc_dataset_with_features_test.tsv", sep="\t", index=False)
+df_clara_test.to_csv("../hasoc_dataset/test_extra_features_test.tsv", sep="\t", index=False)
 
 
 
