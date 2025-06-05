@@ -83,7 +83,7 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 │   ├── load_train.py               # Load standard training data
 │   ├── predict.py                  # Prediction script
 │   ├── print_results.ipynb         # Notebook for result visualization
-│   ├── show_cm.py                  # Show confusion matrices
+│   ├── show_cm.py                  # Show confusion matrices when using grids
 │   └── train.py                    # Training script
 │
 ├── new_features                    # Additional features
@@ -126,7 +126,7 @@ Finally, run the whole project:
 
 Optional:  
 - `new_features/features_cond_analysis.py` to perform a conditional analysis of tweets given the 13 features.  
-- `hasoc_model_boosted/show_cm.py` to show the Top 1 confusion matrices of the results.  
+- `hasoc_model_boosted/show_cm.py` to show the Top 1 confusion matrices of the results when using grids. 
 - `hasoc_model_boosted/print_results.py` to print results.
 
 ## Ideas of improvement
