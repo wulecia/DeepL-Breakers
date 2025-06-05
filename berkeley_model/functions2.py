@@ -39,19 +39,19 @@ def train_with_checkpoint(model, optimizer, train_loader, val_loader, loss_fn_nu
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         start_epoch = checkpoint['epoch'] + 1
-        print(f"✅ Resumed from epoch {start_epoch}")
+        print(f"Resumed from epoch {start_epoch}")
 
     for epoch in range(start_epoch, start_epoch + num_extra_epochs):
         train_loss = train_epoch(model, train_loader, optimizer, loss_fn_num, loss_fn_bin, device)
         val_loss = evaluate(model, val_loader, loss_fn_num, loss_fn_bin, device)
-        print(f"📚 Epoch {epoch+1}: Train Loss = {train_loss:.4f}, Val Loss = {val_loss:.4f}")
+        print(f"Epoch {epoch+1}: Train Loss = {train_loss:.4f}, Val Loss = {val_loss:.4f}")
 
         torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict()
         }, checkpoint_path)
-        print(f"💾 Saved checkpoint at epoch {epoch+1}")
+        print(f"Saved checkpoint at epoch {epoch+1}")
 
         torch.save(model.state_dict(), f"bert_multitask_epoch{epoch+1}.pt")
 
@@ -208,11 +208,11 @@ def compute_scores(model, loader, device):
     y_pred_bin = (torch.cat(all_preds_bin) > 0.5).numpy()
     y_true_bin = torch.cat(all_true_bin).numpy()
 
-    print("\n📊 Regression (Numerical):")
+    print("\n Regression (Numerical):")
     print(f"• R² Score: {r2_score(y_true_num, y_pred_num):.4f}")
     print(f"• MSE: {mean_squared_error(y_true_num, y_pred_num):.4f}")
 
-    print("\n⚖️ Classification (Binary):")
-    print(f"• Accuracy: {accuracy_score(y_true_bin, y_pred_bin):.4f}")
-    print(f"• F1 Macro: {f1_score(y_true_bin, y_pred_bin, average='macro'):.4f}")
-    print(f"• F1 Micro: {f1_score(y_true_bin, y_pred_bin, average='micro'):.4f}")
+    print("\n Classification (Binary):")
+    print(f"Accuracy: {accuracy_score(y_true_bin, y_pred_bin):.4f}")
+    print(f"F1 Macro: {f1_score(y_true_bin, y_pred_bin, average='macro'):.4f}")
+    print(f"F1 Micro: {f1_score(y_true_bin, y_pred_bin, average='micro'):.4f}")

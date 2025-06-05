@@ -1,4 +1,3 @@
-# train.py
 from functions2 import train_with_logging
 from model_utils import get_model, get_dataloaders, get_loss_and_optimizer
 
