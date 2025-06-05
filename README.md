@@ -89,7 +89,7 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 ├── new_features                    # Additional features
 │   ├── add_extra_features.ipynb    # Notebook to add extra features
 │   ├── add_extra_features.py       # Script to add extra features
-│   └── features_descr_analysis.py  # Descriptive analysis of the features
+│   └── features_cond_analysis.py   # Conditional analysis of the features
 │
 ├── LICENSE_berkeley                # License for the Berkeley dataset
 ├── LICENSE_hasoc                   # License for the Hasoc dataset
@@ -134,7 +134,7 @@ Optional:
 Train on complementary datasets  
 Extend to multilingual models  
 Perform feature ablation studies  
-Test robustness across tweet platforms (TikTok, YouTube, Instagram...)  
+Test robustness across other tweet platforms (TikTok, YouTube, Instagram...)  
 Preprocess tweets (stemming, lemmatization...)
 
 ## References
