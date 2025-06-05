@@ -42,7 +42,7 @@ LABEL_MAPS = {
 
 
 def load_model(task, experiment, device):
-    model_path = f"./results/{experiment}/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
+    model_path = f"./results/models/{experiment}/best_boostedmodel_{task}_{MODEL_NAMES[task].split('/')[-1]}"
     model = CombinedModel(MODEL_NAMES[task], NUM_LABELS[task], extra_feature_dim=13)
 
     state_dict = torch.load(model_path + ".pth", map_location=device)
@@ -105,7 +105,7 @@ def evaluate_predictions(preds, experiment, labels, task, class_weights=None):
 
 
 def main():
-    experiment = "random_init"
+    experiment = "load"
 
     df = pd.read_csv("../hasoc_dataset/test_extra_features.tsv", sep="\t")
     df = encode_labels(df)
