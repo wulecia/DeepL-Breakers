@@ -11,8 +11,8 @@ This project explores hate speech and offensive language detection using transfo
 3. Train RoBERTa and HateBERT models on the Hasoc dataset: We use the Hasoc dataset to train a RoBERTa model for Subtask A, and HateBERT models for Subtasks B and C (V1 models). To address class imbalances, we apply subtask-specific class weights, using the WeightedFocalLossTrainer to emphasize harder-to-classify examples and improve performance on underrepresented classes.
 
 4. Train several models on the Hasoc dataset with 13 features to boost performance: We coded 3 models (V2 models) with same architecture, integrating the 13 inferred features from the first stage into the classification models, with different class weighting strategies. The V2 models are obtained by fine-tuning each V1 model with 3 strategies:  
-- V2.1: Using pretrained RoBERTa and HateBERT transformer parts.  
-- V2.2: Loading fine-tuned parameters (weights and biases) from the best V1 models to transformer layers, without freezing.  
+- V2.1: Using pretrained RoBERTa and HateBERT transformer parts, with no freezing.  
+- V2.2: Loading fine-tuned parameters (weights and biases) from the best V1 models to transformer layers, with no freezing.  
 - V2.3: Loading fine-tuned parameters (weights and biases) from the best V1 models to transformer layers and freezing them.
 
 ## Subtasks
