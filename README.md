@@ -112,7 +112,7 @@ Then, install the requirements:
 - Install requirements using `pip3 install -r requirements.txt`
 
 Finally, run the whole project:  
-- `berkeley_model/...py` to train [BertMultiTasks model](#feature-extraction-model) on the Berkeley Dataset (1).  
+- `berkeley_model/train.py` to train [BertMultiTasks model](#feature-extraction-model) on the Berkeley Dataset (1).  
 - `new_features/add_extra_features.py` to infer the 13 features to the Hasoc dataset (2).  
 - `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate [baseline RoBERTa and HateBERT models](#hate-speech-classification-models) on the Hasoc dataset (3).  
 
