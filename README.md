@@ -53,7 +53,7 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 │   ├── best_Berkeley_model.pth     # Best model weights
 │   ├── functions2.py               # Supporting functions
 │   ├── model_utils.py              # Utility functions for the model
-│   ├── test.py                     # Script to test the model
+│   ├── test.py                     # Script to test the model, use command : python3 test.py best_Berkeley_model.pth
 │   ├── train.py                    # Script to train the model
 │   ├── try.py                      # Experimentation script to see output for example comments
 │   └── visualize_data.ipynb        # Notebook to visualize data
