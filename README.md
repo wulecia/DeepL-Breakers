@@ -126,8 +126,8 @@ Finally, run the whole project:
 
 Optional:  
 - `new_features/features_cond_analysis.py` to perform a conditional analysis of tweets given the 13 features.  
-- `hasoc_model_boosted/show_cm.py` to show the Top 1 confusion matrices of the results when using grids. 
-- `hasoc_model_boosted/print_results.py` to print results.
+- `hasoc_model_boosted/print_results.py` to save the Top 1 confusion matrices of the results for each subtask when using grids. 
+- `hasoc_model_boosted/print_results.py` to show on a notebook the best confusion matrices of the results when using grids.
 
 ## Ideas of improvement
 
