@@ -4,13 +4,13 @@
 This project explores hate speech and offensive language detection using transformer-based models. It proceeds in two main stages:
 
 ### Feature Extraction Model:
-1. Train a Multitask DistilBERT on Berkeley dataset: We first train a BERTMultiTaskModel model on a labeled [dataset from Berkeley](#ref1) containing 13 distinct categories (8 numerical: *sentiment*, *respect*, *insult*, *humiliate*, *status*, *dehumanize*, *attack_defend*, *hatespeech*; 5 binary: *target_race*, *target_religion*, *target_origin*, *target_gender*, *target_sexuality*).
+1. Train a Multitask DistilBERT on the Berkeley dataset: We first train a BERTMultiTaskModel model on a labeled [dataset from Berkeley](#ref1) containing 13 distinct categories (8 numerical: *sentiment*, *respect*, *insult*, *humiliate*, *status*, *dehumanize*, *attack_defend*, *hatespeech*; 5 binary: *target_race*, *target_religion*, *target_origin*, *target_gender*, *target_sexuality*).
 2. Infer 13 features for each HASOC tweet: After achieving satisfying performance, we apply this model to a second dataset — [HASOC 2019](#ref2) — to annotate tweets with these 13 inferred features. 
 
 ### Hate Speech Classification Models:
-3. Train RoBERTa and HateBERT models on Hasoc dataset: We use the HASOC dataset to train a RoBERTa model for Subtask A, and HateBERT models for Subtasks B and C (V1 models). To address class imbalances, we apply subtask-specific class weights, using the WeightedFocalLossTrainer to emphasize harder-to-classify examples and improve performance on underrepresented classes.
+3. Train RoBERTa and HateBERT models on the Hasoc dataset: We use the Hasoc dataset to train a RoBERTa model for Subtask A, and HateBERT models for Subtasks B and C (V1 models). To address class imbalances, we apply subtask-specific class weights, using the WeightedFocalLossTrainer to emphasize harder-to-classify examples and improve performance on underrepresented classes.
 
-4. Train several models on Hasoc dataset with 13 features to boost performance: We coded 3 models (V2 models) with same architecture, integrating the 13 inferred features from the first stage into the classification models, with different class weighting strategies. The V2 models are obtained by fine-tuning each V1 model with 3 strategies:  
+4. Train several models on the Hasoc dataset with 13 features to boost performance: We coded 3 models (V2 models) with same architecture, integrating the 13 inferred features from the first stage into the classification models, with different class weighting strategies. The V2 models are obtained by fine-tuning each V1 model with 3 strategies:  
 - V2.1: Using pretrained RoBERTa and HateBERT transformer parts.  
 - V2.2: Loading fine-tuned parameters (weights and biases) from the best V1 models to transformer layers, without freezing.  
 - V2.3: Loading fine-tuned parameters (weights and biases) from the best V1 models to transformer layers and freezing them.
@@ -22,7 +22,7 @@ The HASOC 2019 dataset contains tweets in English, German, and Hindi. We focus o
 
 HOF – Hate and Offensive: Contains hate speech, aggression, or profanity.
 
-NOT – Non Hate-Offensive: Contains acceptable content without any offensive language.
+NOT – Non Hate-Offensive: Contains acceptable content without any offensive language.  
 
 - **Sub-task B: Fine-Grained Offensive Type Classification**  
   Only tweets labeled as HOF in sub-task A are used. To disambiguate the type of offense expressed in HOF tweets, each HOF tweet is further categorized into:
@@ -31,7 +31,7 @@ HATE – Hate speech targeting groups based on race, gender, religion, etc.
 
 OFFN – Offensive language targeting an individual or group, including insults or threats.
 
-PRFN – Profane language without specific targeting (e.g., general swearing or cursing).
+PRFN – Profane language without specific targeting (e.g., general swearing or cursing).  
 
 - **Sub-task C: Offense Target Identification**  
   Only tweets labeled HOF in sub-task A are included. The goal is to determine the target of the offensive language:
@@ -44,7 +44,7 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 
 ```plaintext
 .
-├── berkeley_model                  # Model for feature generation with Berkeley dataset
+├── berkeley_model                  # Model for feature generation with the Berkeley dataset
 │   ├── data
 │   │   └── measuring-hate-speech.parquet  # Parquet file with Berkeley data
 │   ├── results                     # Plots and test results
@@ -91,8 +91,8 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 │   ├── add_extra_features.py       # Script to add extra features
 │   └── features_descr_analysis.py  # Descriptive analysis of the features
 │
-├── LICENSE_berkeley                # License for Berkeley dataset
-├── LICENSE_hasoc                   # License for HASOC dataset
+├── LICENSE_berkeley                # License for the Berkeley dataset
+├── LICENSE_hasoc                   # License for the Hasoc dataset
 ├── README.md                       # This file
 └── requirements.txt                # Required Python packages
 ```
@@ -112,11 +112,11 @@ Then, install the requirements:
 - Install requirements using `pip3 install -r requirements.txt`
 
 Finally, run the whole project:  
-- `berkeley_model/...py` to train [BertMultiTasks model](#feature-extraction-model) on Berkeley Dataset (1).  
-- `new_features/add_extra_features.py` to infer the 13 features to Hasoc Dataset (2).  
-- `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate [baseline RoBERTa and HateBERT models](#hate-speech-classification-models) on Hasoc Dataset (3).  
+- `berkeley_model/...py` to train [BertMultiTasks model](#feature-extraction-model) on the Berkeley Dataset (1).  
+- `new_features/add_extra_features.py` to infer the 13 features to the Hasoc dataset (2).  
+- `hasoc_model_base/train.py` then `hasoc_model_base/predict.py` to train and evaluate [baseline RoBERTa and HateBERT models](#hate-speech-classification-models) on the Hasoc dataset (3).  
 
-  Depending on the experiment, you have to run different files for training the fine-tuned models on augmented Hasoc Dataset (4):  
+  Depending on the experiment, you have to run different files for training the fine-tuned models on augmented the Hasoc dataset (4):  
 - `hasoc_model_boosted/train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with [V2.1 model](#hate-speech-classification-models).  
 - `hasoc_model_boosted/grid_train.py` then `hasoc_model_boosted/grid_predict.py` if you have a grid of specific class weights to try with [V2.1 model](#hate-speech-classification-models).  
 - `hasoc_model_boosted/load_train.py` then `hasoc_model_boosted/predict.py` if you have specific class weights to try with [V2.2 or V2.3 model](#hate-speech-classification-models).
