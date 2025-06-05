@@ -89,7 +89,7 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 ├── new_features                    # Additional features
 │   ├── add_extra_features.ipynb    # Notebook to add extra features
 │   ├── add_extra_features.py       # Script to add extra features
-│   └── features_cond_analysis.py   # Conditional analysis of the features
+│   └── features_cond_analysis.py   # Conditional analysis of tweets given the features
 │
 ├── LICENSE_berkeley                # License for the Berkeley dataset
 ├── LICENSE_hasoc                   # License for the Hasoc dataset
@@ -125,7 +125,7 @@ Finally, run the whole project:
   For the last two, change `freeze` and `experiment` variables to choose between [V2.2 or V2.3 model](#hate-speech-classification-models).  
 
 Optional:  
-- `new_features/features_cond_analysis.py` to perform a conditional analysis of the 13 features.  
+- `new_features/features_cond_analysis.py` to perform a conditional analysis of tweets given the 13 features.  
 - `hasoc_model_boosted/show_cm.py` to show the Top 1 confusion matrices of the results.  
 - `hasoc_model_boosted/print_results.py` to print results.
 
