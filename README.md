@@ -100,11 +100,11 @@ UNT – Untargeted: Profane or aggressive language without a specific target.
 ## Running
 First, download all pretrained models:  
 - Move this to the folder "berkeley_model":  
-python3 -m gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW  
+`python3 -m gdown https://drive.google.com/uc?id=1ADAqy8HwLNSsep-wMnzAcGTyULZWHRyW`  
 - Move these to the folder "hasoc_model_base":  
-python3 -m gdown https://drive.google.com/uc?id=1o1b4vRKceIVEPSfXUrcrlSFvD6nQYc-9  
-python3 -m gdown https://drive.google.com/uc?id=1Wem7CyJh8T-gb-ct8fLIejsPV_5frJls  
-python3 -m gdown https://drive.google.com/uc?id=1_65mHOetpg9Z1S3X5zoAtplSZyyWlly3  
+`python3 -m gdown https://drive.google.com/uc?id=1o1b4vRKceIVEPSfXUrcrlSFvD6nQYc-9`  
+`python3 -m gdown https://drive.google.com/uc?id=1Wem7CyJh8T-gb-ct8fLIejsPV_5frJls`  
+`python3 -m gdown https://drive.google.com/uc?id=1_65mHOetpg9Z1S3X5zoAtplSZyyWlly3`  
 
 Then, install the requirements:  
 - If you are using a GPU, run `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126` (replace cu126 with your CUDA version).  
