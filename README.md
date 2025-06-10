@@ -14,6 +14,7 @@ This mp4 file presents (with captions included) :
 - The inference running
 - The notebook to visualize the best confusion matrices  
 
+## Pipeline  
 ### Feature Extraction Model:
 1. Train a Multitask DistilBERT on the Berkeley dataset: We first train a BERTMultiTaskModel model on a labeled [dataset from Berkeley](#ref1) containing 13 distinct categories (8 numerical: *sentiment*, *respect*, *insult*, *humiliate*, *status*, *dehumanize*, *attack_defend*, *hatespeech*; 5 binary: *target_race*, *target_religion*, *target_origin*, *target_gender*, *target_sexuality*).
 2. Infer 13 features for each HASOC tweet: After achieving satisfying performance, we apply this model to a second dataset — [HASOC 2019](#ref2) — to annotate tweets with these 13 inferred features. 
